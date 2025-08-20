@@ -19,5 +19,21 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Unico Case Ai Voice Chat App"
+rootProject.name = "UnicoCaseAiVoiceChatApp"
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 include(":app")
+
+// Core Project Modules
+include(":core:common")
+include(":core:data")
+include(":core:service")
+include(":core:designsystem")
+include(":core:domain")
+include(":core:navigation")
+
+// Feature Project Modules
+include(":feature:chat")
+include(":feature:history")
+include(":feature:settings")
