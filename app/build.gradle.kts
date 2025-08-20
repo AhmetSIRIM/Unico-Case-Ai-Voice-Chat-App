@@ -46,11 +46,24 @@ android {
 
 dependencies {
 
+    // Core Project Modules
+    implementation(projects.core.common)
+    implementation(projects.core.data)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.domain)
+    implementation(projects.core.navigation)
+    implementation(projects.core.service)
+
+    // Feature Project Modules
+    implementation(projects.feature.chat)
+    implementation(projects.feature.history)
+    implementation(projects.feature.settings)
+
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Compose Dependencies
+    // Compose Dependencies - Some compose dependencies can be accessed through the `:core:designsystem` module
     implementation(libs.androidx.activity.compose)
 
     // Hilt

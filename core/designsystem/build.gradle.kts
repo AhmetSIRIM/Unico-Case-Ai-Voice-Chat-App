@@ -30,20 +30,20 @@ android {
 dependencies {
 
     // Core Project Modules
-    api(projects.core.common)
-    api(projects.core.domain)
+    implementation(projects.core.common)
+    implementation(projects.core.domain)
 
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
 
     // Compose Dependencies & Hilt Navigation Compose Dependency
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.ui.google.fonts)
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.ui.google.fonts)
     api(libs.androidx.compose.ui)
     api(libs.androidx.foundation)
     api(libs.hilt.navigation.compose)
-    implementation(libs.androidx.ui.tooling)
-    implementation(libs.androidx.ui.tooling.preview)
+    api(libs.androidx.ui.tooling)
+    api(libs.androidx.ui.tooling.preview)
 
 }

@@ -35,13 +35,9 @@ dependencies {
     implementation(projects.core.designsystem)
 
     // Feature Project Modules
-    //
-    // The reason why Feature Project Modules
-    // are integrated with `api` is to give
-    // the app module access to the feature modules.
-    api(projects.feature.chat)
-    api(projects.feature.history)
-    api(projects.feature.settings)
+    implementation(projects.feature.chat)
+    implementation(projects.feature.history)
+    implementation(projects.feature.settings)
 
     // Navigation Component
     implementation(libs.navigation.common)
