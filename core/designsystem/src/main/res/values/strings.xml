@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--  Top Level Routes Names  -->
+    <string name="chat_route">Chat</string>
+    <string name="history_route">History</string>
+    <string name="settings_route">Settings</string>
+
+</resources>
