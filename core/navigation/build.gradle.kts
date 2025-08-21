@@ -27,12 +27,16 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
 
     // Core Project Modules
     implementation(projects.core.designsystem)
+    implementation(projects.core.common)
 
     // Feature Project Modules
     implementation(projects.feature.chat)
