@@ -41,7 +41,7 @@ roomCompiler = "2.7.2"
 roomKtx = "2.7.2"
 
 # Hilt & Javax
-hilt = "2.57"
+hilt = "2.57.1"
 hiltNavigation = "1.2.0"
 javaxInject = "1"
 
@@ -53,6 +53,9 @@ firebaseBom = "34.1.0"
 gmsGoogleServices = "4.4.3"
 crashlytics = "3.0.6"
 appdistribution = "5.1.1"
+
+# Tools (Timber)
+timber = "5.0.1"
 
 [libraries]
 # AndroidX Core
@@ -108,6 +111,9 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx"
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+
+# Tools (Timber)
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

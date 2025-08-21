@@ -27,6 +27,9 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 // Specifies where Room database schema files (in JSON format) will be saved.
@@ -58,5 +61,9 @@ dependencies {
     // Room Database
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Firebase Bill of Material (BoM) & Other Firebase Libraries
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 
 }

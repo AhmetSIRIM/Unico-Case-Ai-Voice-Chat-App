@@ -40,4 +40,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 
+    // Tools (Timber)
+    implementation(libs.timber)
+
 }
