@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.android.secrets.gradle.plugin)
 }
 
 android {
@@ -16,8 +17,16 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            buildConfigField("String", "GEMINI_GENERATIVE_AI_API_KEY", "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: "debug_dummy_key"}\"")
+            buildConfigField("String", "GEMINI_GENERATIVE_AI_MODEL_NAME", "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\"")
+        }
+
         release {
             isMinifyEnabled = false
+
+            buildConfigField("String", "GEMINI_GENERATIVE_AI_API_KEY", "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: ""}\"")
+            buildConfigField("String", "GEMINI_GENERATIVE_AI_MODEL_NAME", "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\"")
         }
     }
     compileOptions {
@@ -41,11 +50,15 @@ dependencies {
 
     // Core Project Modules
     implementation(projects.core.common)
+    implementation(projects.core.designsystem)
     implementation(projects.core.domain)
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+
+    // Google Generative AI
+    implementation(libs.google.generative.ai)
 
     // Retrofit & Moshi & OkHttp
     implementation(libs.retrofit)
@@ -66,4 +79,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
 
+}
+
+// Configuration block for handling sensitive data securely (e.g., API keys, tokens, passwords)
+secrets {
+    propertiesFileName = "secrets.properties" // Specifies the main file where sensitive data is stored securely.
+    defaultPropertiesFileName = "local.defaults.properties" // Provides a fallback file with default values for missing keys, typically used in local or development environments.
 }

@@ -11,7 +11,7 @@ import timber.log.Timber
  * @param tag The log tag (defaults to "UnicoCaseDebug")
  * @return The original object for chaining
  */
-fun <T> T?.logDebugThenReturnSimply(message: String = this.toString(), tag: String = "UnicoCaseDebug") = also { Timber.tag(tag).d(message = message) }
+fun <T> T.logDebugThenReturnSimply(message: String = this.toString(), tag: String = "UnicoCaseDebug") = also { Timber.tag(tag).d(message = message) }
 
 /**
  * Logs a message with specified log level using the class name as tag.
