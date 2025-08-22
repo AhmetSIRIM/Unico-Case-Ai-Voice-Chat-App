@@ -1,6 +1,6 @@
 package com.ahmetsirim.data.utility
 
-import com.ahmetsirim.data.exceptionhandling.handleThrowable
+import com.ahmetsirim.data.exception.handleThrowable
 import com.ahmetsirim.domain.model.common.Response
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onStart
  *
  * This function wraps the provided [manipulateTheSuccessResultData] in a [Flow], emitting [Response.Loading]
  * at the start. On success, it emits the result as [Response.Success]. If an exception occurs, it transforms
- * the error into [Response.Error] using [com.ahmetsirim.data.exceptionhandling.handleThrowable] and emits it.
+ * the error into [Response.Error] using [com.ahmetsirim.data.exception.handleThrowable] and emits it.
  *
  * @param coroutineDispatcher The [CoroutineDispatcher] to run the flow on, typically for I/O operations
  * @param manipulateTheSuccessResultData A suspend function that executes the network request and returns a [Response]

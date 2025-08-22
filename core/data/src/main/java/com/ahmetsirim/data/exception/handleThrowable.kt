@@ -1,4 +1,4 @@
-package com.ahmetsirim.data.exceptionhandling
+package com.ahmetsirim.data.exception
 
 import android.util.Log
 import com.ahmetsirim.common.log.log
@@ -26,16 +26,22 @@ internal fun Throwable.handleThrowable(): Response<Nothing> {
     return when (this) {
         is CancellationException -> throw this
 
-        is IOException -> Response.Error(errorState = connectionErrorState)
+        is IOException -> Response.Error(
+            errorState = ErrorState(
+                exceptionMessageResId = coreR.string.please_check_your_connection_and_try_again,
+            )
+        )
 
-        else -> Response.Error(errorState = unexpectedErrorState)
+        is UnsupportedGenerativeAiException -> Response.Error(
+            errorState = ErrorState(
+                exceptionMessageResId = coreR.string.model_not_yet_supported,
+            )
+        )
+
+        else -> Response.Error(
+            errorState = ErrorState(
+                exceptionMessageResId = coreR.string.there_was_an_unexpected_error_please_try_again_soon,
+            )
+        )
     }
 }
-
-private val unexpectedErrorState = ErrorState(
-    exceptionMessageResId = coreR.string.there_was_an_unexpected_error_please_try_again_soon,
-)
-
-private val connectionErrorState = ErrorState(
-    exceptionMessageResId = coreR.string.please_check_your_connection_and_try_again,
-)

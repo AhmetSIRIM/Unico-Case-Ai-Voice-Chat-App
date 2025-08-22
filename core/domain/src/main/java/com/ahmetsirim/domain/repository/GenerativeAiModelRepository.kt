@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface GenerativeAiModelRepository {
 
-    suspend fun getMessage(message: String): Flow<Response<String>>
-    suspend fun getMessageWithContext(message: String, chatHistory: List<ChatMessage>): Flow<Response<String>>
+    suspend fun generateContent(message: String): Flow<Response<String>>
+    suspend fun generateContentWithContext(message: String, chatHistory: List<ChatMessage>): Flow<Response<String>>
 
 }
