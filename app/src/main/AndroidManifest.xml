@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".UnicoCaseAiVoiceChatApplication"
         android:allowBackup="true"
@@ -13,9 +15,9 @@
         android:theme="@style/Theme.UnicoCaseAiVoiceChatApp">
         <activity
             android:name=".ui.MainActivity"
-            android:windowSoftInputMode="adjustNothing"
             android:exported="true"
-            android:theme="@style/Theme.UnicoCaseAiVoiceChatApp">
+            android:theme="@style/Theme.UnicoCaseAiVoiceChatApp"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

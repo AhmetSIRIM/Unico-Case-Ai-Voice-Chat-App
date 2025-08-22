@@ -1,7 +1,9 @@
 package com.ahmetsirim.data.di
 
 import com.ahmetsirim.data.repository.GenerativeAiModelRepositoryImpl
+import com.ahmetsirim.data.repository.GoogleTextToSpeechRepositoryImpl
 import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
+import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,8 +16,14 @@ abstract class RepositoryModule {
 
     @Binds
     @ViewModelScoped
-    abstract fun bindRemoteGenerativeAiModelDataSource(
+    abstract fun bindGenerativeAiModelRepository(
         generativeAiModelRepositoryImpl: GenerativeAiModelRepositoryImpl,
     ): GenerativeAiModelRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindTextToSpeechRepository(
+        googleTextToSpeechRepositoryImpl: GoogleTextToSpeechRepositoryImpl,
+    ): GoogleTextToSpeechRepository
 
 }
