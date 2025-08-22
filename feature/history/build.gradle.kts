@@ -33,6 +33,7 @@ android {
 dependencies {
 
     // Core Project Modules
+    implementation(projects.core.common)
     implementation(projects.core.domain)
     implementation(projects.core.designsystem)
 
