@@ -15,7 +15,7 @@ pipeline {
                      sortMode: 'ASCENDING_SMART',
                      quickFilterEnabled: true
 
-        string name: 'notes',
+        string name: 'Additional optional note',
                description: 'Write your release notes',
                defaultValue: ''
     }
@@ -55,7 +55,7 @@ pipeline {
         stage('Distribute') {
             steps {
                 withCredentials([
-                    file(credentialsId: 'unico_case_ai_voice_chat_app', variable: 'GOOGLE_APPLICATION_CREDENTIALS')
+                    file(credentialsId: 'UNICO_CASE_AI_VOICE_CHAT_APP', variable: 'GOOGLE_APPLICATION_CREDENTIALS')
                 ]) {
                     sh '''
                         touch releasenotes_release.txt
