@@ -30,6 +30,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            firebaseAppDistribution {
+                artifactType = "APK"
+                releaseNotesFile = "releasenotes.txt"
+                serviceCredentialsFile = System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+                groups = "android"
+            }
         }
     }
     compileOptions {
