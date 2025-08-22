@@ -33,9 +33,6 @@ retrofit = "3.0.0"
 moshi = "1.15.2"
 okhttpBom = "5.1.0"
 
-# DataStore Preferences
-datastorePreferences = "1.1.7"
-
 # Room Database
 roomCompiler = "2.7.2"
 roomKtx = "2.7.2"
@@ -103,9 +100,6 @@ moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.re
 # OkHttp
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
-
-# DataStore Preferences
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 
 # Room Database
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }

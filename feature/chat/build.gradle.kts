@@ -35,6 +35,7 @@ dependencies {
     // Core Project Modules
     implementation(projects.core.common)
     implementation(projects.core.domain)
+    implementation(projects.core.service)
     implementation(projects.core.designsystem)
 
     // Compose Dependencies - Some compose dependencies can be accessed through the `:core:designsystem` module

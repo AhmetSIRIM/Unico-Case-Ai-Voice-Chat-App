@@ -63,43 +63,47 @@ fun UnicoCaseAiVoiceChatNavHost(modifier: Modifier = Modifier) {
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                val context = LocalContext.current
 
-                topLevelRoutes.forEach { topLevelRoute ->
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                imageVector = topLevelRoute.icon,
-                                contentDescription = context.getString(topLevelRoute.nameResourceId)
-                            )
-                        },
-                        label = { Text(context.getString(topLevelRoute.nameResourceId)) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true,
-                        onClick = {
-                            navController.navigate(topLevelRoute.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+            if (navController.currentDestination?.route?.substringAfterLast(".") != "ChatRoute") {
+
+                NavigationBar {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    val context = LocalContext.current
+
+                    topLevelRoutes.forEach { topLevelRoute ->
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    imageVector = topLevelRoute.icon,
+                                    contentDescription = context.getString(topLevelRoute.nameResourceId)
+                                )
+                            },
+                            label = { Text(context.getString(topLevelRoute.nameResourceId)) },
+                            selected = currentDestination?.hierarchy?.any { it.hasRoute(topLevelRoute.route::class) } == true,
+                            onClick = {
+                                navController.navigate(topLevelRoute.route) {
+                                    // Pop up to the start destination of the graph to
+                                    // avoid building up a large stack of destinations
+                                    // on the back stack as users select items
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination when
+                                    // reselecting the same item
+                                    launchSingleTop = true
+                                    // Restore state when reselecting a previously selected item
+                                    restoreState = true
                                 }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
-                                restoreState = true
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
     ) { innerPadding ->
         NavHost(
-            modifier = modifier.padding(innerPadding),
+            modifier = modifier.padding(bottom = innerPadding.calculateBottomPadding()),
             navController = navController,
             startDestination = ChatRoute
         ) {

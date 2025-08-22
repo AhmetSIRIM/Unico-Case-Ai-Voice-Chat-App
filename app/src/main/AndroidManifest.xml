@@ -13,6 +13,7 @@
         android:theme="@style/Theme.UnicoCaseAiVoiceChatApp">
         <activity
             android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="true"
             android:theme="@style/Theme.UnicoCaseAiVoiceChatApp">
             <intent-filter>
