@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -73,6 +74,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToHistory: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -123,13 +125,24 @@ internal fun ChatScreen(
                     )
                 },
                 actions = {
-                    IconButton(
-                        onClick = { navigateToSettings() } // Go to the settings screen
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = null,
-                        )
+                    Row {
+                        IconButton(
+                            onClick = { navigateToHistory() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.List,
+                                contentDescription = null,
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { navigateToSettings() } // Go to the settings screen
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 },
             )
@@ -427,6 +440,7 @@ private fun ChatScreenPreview() {
     ChatScreen(
         uiState = ChatContract.UiState(messages = messages),
         onEvent = {},
-        navigateToSettings = {}
+        navigateToSettings = {},
+        navigateToHistory = {}
     )
 }

@@ -1,4 +1,4 @@
-package com.ahmetsirim.chat
+package com.ahmetsirim.history
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,18 +6,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun ChatContainer(
-    navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit
+fun HistoryContainer(
+    navigateUp: () -> Unit,
+    navigateToChat: (String) -> Unit,
 ) {
-    val viewModel: ChatViewModel = hiltViewModel()
+    val viewModel: HistoryViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    ChatScreen(
+    HistoryScreen(
         uiState = uiState,
         onEvent = viewModel::onEvent,
-        navigateToSettings = navigateToSettings,
-        navigateToHistory = navigateToHistory
+        navigateUp = navigateUp,
+        navigateToChat = navigateToChat
     )
-
 }

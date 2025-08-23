@@ -1,7 +1,9 @@
 package com.ahmetsirim.chat
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.model.common.Response
@@ -14,6 +16,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,10 +28,14 @@ internal class ChatViewModel @Inject constructor(
     private val androidSpeechRecognizerRepository: AndroidSpeechRecognizerRepository,
     private val googleTextToSpeechRepository: GoogleTextToSpeechRepository,
     private val localChatRepository: LocalChatRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
 
     private val _uiState = MutableStateFlow(ChatContract.UiState())
     val uiState: StateFlow<ChatContract.UiState> = _uiState
+        .onStart { getMessagesBySessionId(sessionId) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
@@ -41,6 +48,18 @@ internal class ChatViewModel @Inject constructor(
             ChatContract.UiEvent.UserNotifiedTheError -> _uiState.update { it.copy(errorState = null) }
             ChatContract.UiEvent.OnShowMicrophonePermissionRationale -> _uiState.update { it.copy(isRecordAudioPermissionRationaleInformationalDialogOpen = !it.isRecordAudioPermissionRationaleInformationalDialogOpen) }
         }
+    }
+
+    private suspend fun getMessagesBySessionId(sessionId: String?) {
+        sessionId ?: return
+
+        val messages: List<ChatMessage> = localChatRepository
+            .getChatById(sessionId)
+            .getOrNull()
+            ?.messages
+            ?: emptyList()
+
+        _uiState.update { it.copy(messages = messages) }
     }
 
     private fun startListeningForSpeech() {
