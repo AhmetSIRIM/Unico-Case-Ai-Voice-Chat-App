@@ -18,7 +18,7 @@ internal fun handleMicrophonePermissionRequest(
             context,
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED -> {
-            TODO()
+            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
         }
 
         activity?.let { nonNullActivity ->

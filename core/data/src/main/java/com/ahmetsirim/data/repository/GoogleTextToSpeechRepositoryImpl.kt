@@ -66,7 +66,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
         }
     }
 
-    fun stopSpeaking() {
+    override fun stopSpeaking() {
         try {
             if (mediaPlayer.isPlaying) {
                 mediaPlayer.stop()
@@ -154,7 +154,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
         }
     }
 
-    fun cleanup() {
+    override fun cleanup() {
         log("cleanup() called", tag = TAG)
         stopSpeaking()
     }

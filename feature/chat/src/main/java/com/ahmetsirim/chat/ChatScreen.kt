@@ -4,6 +4,14 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,16 +32,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +62,9 @@ import com.ahmetsirim.common.utility.launchAppDetailsSettings
 import com.ahmetsirim.designsystem.R
 import com.ahmetsirim.designsystem.component.InformationalDialog
 import com.ahmetsirim.designsystem.utility.ResponsivenessCheckerPreview
+import com.ahmetsirim.designsystem.utility.noRippleClickable
 import com.ahmetsirim.domain.model.ChatMessage
+import com.ahmetsirim.domain.model.SpeechResult
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +82,7 @@ internal fun ChatScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { permission ->
             when (permission) {
-                true -> TODO()
+                true -> onEvent(ChatContract.UiEvent.OnTheUserIsListened)
                 false -> onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
             }
         }
@@ -110,24 +126,35 @@ internal fun ChatScreen(
                         ),
                     )
                 },
+                actions = {
+                    IconButton(
+                        onClick = { TODO() } // Go to the settings screen
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = null,
+                        )
+                    }
+                },
             )
         },
         bottomBar = {
             Row(
                 modifier = Modifier
+                    .systemBarsPadding()
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
-                Canvas(
-                    Modifier
-                        .size(100.dp)
-                ) {
-                    drawCircle(
-                        color = Color.Red,
-                        radius = size.minDimension / 2
-                    )
-                }
+                AnimatedMicrophoneButton(
+                    speechResult = uiState.speechResult,
+                    isAiTyping = uiState.isAiSpeaking,
+                    onClick = {
+                        if (uiState.messages.lastOrNull()?.isFromUser != true && !uiState.isAiSpeaking) {
+                            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
+                        }
+                    }
+                )
             }
         }
     ) { paddingValues ->
@@ -149,9 +176,115 @@ internal fun ChatScreen(
 
             ChatContent(
                 messages = uiState.messages,
-                isAiTyping = uiState.isAiTyping,
+                isAiTyping = uiState.isAiSpeaking,
                 listState = listState,
+                speechResult = uiState.speechResult,
                 modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun AnimatedMicrophoneButton(
+    speechResult: SpeechResult?,
+    isAiTyping: Boolean,
+    onClick: () -> Unit,
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
+
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse_scale"
+    )
+
+    val rippleScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "ripple_scale"
+    )
+
+    val isActive = speechResult != null || isAiTyping
+    val isListening = speechResult is SpeechResult.BeginningOfSpeech
+
+    val buttonScale by animateFloatAsState(
+        targetValue = if (isActive) pulseScale else 1f,
+        animationSpec = tween(durationMillis = 300),
+        label = "button_scale"
+    )
+
+    Box(
+        modifier = Modifier.size(120.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isListening) {
+            Canvas(
+                modifier = Modifier.size(120.dp)
+            ) {
+                drawCircle(
+                    color = Color.Green.copy(alpha = 0.3f),
+                    radius = (size.minDimension / 2) * rippleScale
+                )
+                drawCircle(
+                    color = Color.Green.copy(alpha = 0.2f),
+                    radius = (size.minDimension / 2) * (rippleScale * 0.7f)
+                )
+            }
+        }
+
+        Canvas(
+            modifier = Modifier
+                .size((100 * buttonScale).dp)
+                .noRippleClickable { onClick() }
+        ) {
+            val color = when {
+                isAiTyping -> Color(0xFF2196F3)
+                speechResult is SpeechResult.BeginningOfSpeech -> Color(0xFF4CAF50)
+                speechResult is SpeechResult.EndOfSpeech -> Color(0xFFFF9800)
+                speechResult is SpeechResult.Error -> Color(0xFFF44336)
+                speechResult is SpeechResult.FinalResult -> Color(0xFF673AB7)
+                else -> Color(0xFF9E9E9E)
+            }
+
+            drawCircle(
+                color = color,
+                radius = size.minDimension / 2
+            )
+
+            drawCircle(
+                color = color.copy(alpha = 0.7f),
+                radius = size.minDimension / 3
+            )
+        }
+
+        if (isActive) {
+            val statusText = when {
+                isAiTyping -> "🤔"
+                speechResult is SpeechResult.BeginningOfSpeech -> ""
+                speechResult is SpeechResult.EndOfSpeech -> ""
+                else -> "🎙"
+            }
+
+            Text(
+                text = statusText,
+                fontSize = 24.sp,
+                color = Color.White
+            )
+        } else {
+            Text(
+                text = "🎙️",
+                fontSize = 24.sp,
+                color = Color.White
             )
         }
     }
@@ -163,6 +296,7 @@ private fun ChatContent(
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
     listState: LazyListState,
+    speechResult: SpeechResult?,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -219,7 +353,6 @@ private fun MessageBubble(message: ChatMessage) {
         horizontalArrangement = if (message.isFromUser) Arrangement.End else Arrangement.Start
     ) {
         if (!message.isFromUser) {
-            // AI Avatar
             Box(
                 modifier = Modifier
                     .size(32.dp)
@@ -240,7 +373,10 @@ private fun MessageBubble(message: ChatMessage) {
                 .let {
                     if (message.isFromUser) it.padding(start = 48.dp)
                     else it.padding(end = 48.dp)
-                },
+                }
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+                ),
             shape = RoundedCornerShape(
                 topStart = if (message.isFromUser) 16.dp else 4.dp,
                 topEnd = if (message.isFromUser) 4.dp else 16.dp,
