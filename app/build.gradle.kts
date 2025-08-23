@@ -30,6 +30,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            firebaseAppDistribution {
+                artifactType = "APK"
+                releaseNotesFile = "releasenotes.txt"
+                serviceCredentialsFile = System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+                groups = "android"
+            }
         }
     }
     compileOptions {
@@ -53,7 +60,6 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.domain)
     implementation(projects.core.navigation)
-    implementation(projects.core.service)
 
     // Feature Project Modules
     implementation(projects.feature.chat)
@@ -64,8 +70,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Compose Dependencies - Some compose dependencies can be accessed through the `:core:designsystem` module
-    implementation(libs.androidx.activity.compose)
+    // Compose dependencies can be accessed through the `:core:designsystem` module
 
     // Hilt
     implementation(libs.hilt.android)
