@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.appdistribution)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.jacoco)
 }
 
 android {
@@ -50,6 +52,10 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -88,4 +94,42 @@ dependencies {
     // Tools (Timber)
     implementation(libs.timber)
 
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*"
+    )
+
+    val debugTree = fileTree("${layout.buildDirectory}/intermediates/javac/debug") {
+        exclude(fileFilter)
+    }
+    val kotlinDebugTree = fileTree("${layout.buildDirectory}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    classDirectories.setFrom(files(debugTree, kotlinDebugTree))
+    sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+    executionData.setFrom(files("${layout.buildDirectory}/jacoco/testDebugUnitTest.exec"))
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+    outputToConsole.set(true)
+    outputColorName.set("RED")
 }
