@@ -130,7 +130,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "roomKtx" }
-google-services = { id = "com.google.gms.google-services", version.ref = "gmsGoogleServices" }
+#google-services = { id = "com.google.gms.google-services", version.ref = "gmsGoogleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "appdistribution" }
 google-android-secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePluginVersion" }
