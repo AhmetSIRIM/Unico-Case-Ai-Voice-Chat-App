@@ -92,10 +92,10 @@ internal class ChatViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
-
         googleTextToSpeechRepository.cleanup()
         androidSpeechRecognizerRepository.cleanup()
+
+        super.onCleared()
     }
 
 }

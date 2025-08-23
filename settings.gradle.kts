@@ -28,7 +28,6 @@ include(":app")
 // Core Project Modules
 include(":core:common")
 include(":core:data")
-include(":core:service")
 include(":core:designsystem")
 include(":core:domain")
 include(":core:navigation")

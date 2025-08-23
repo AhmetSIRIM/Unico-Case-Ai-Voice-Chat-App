@@ -17,21 +17,16 @@ internal fun handleMicrophonePermissionRequest(
         ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED -> {
-            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
-        }
+        ) == PackageManager.PERMISSION_GRANTED -> Unit
 
         activity?.let { nonNullActivity ->
             ActivityCompat.shouldShowRequestPermissionRationale(
                 nonNullActivity,
                 Manifest.permission.RECORD_AUDIO
             )
-        } == true -> {
-            onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
-        }
+        } == true -> onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
 
-        else -> {
-            permissionRequesterActivityResultLauncher.launch(Manifest.permission.RECORD_AUDIO)
-        }
+        else -> permissionRequesterActivityResultLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
+
 }

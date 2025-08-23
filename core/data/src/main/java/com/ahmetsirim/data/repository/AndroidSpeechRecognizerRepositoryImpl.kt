@@ -25,12 +25,11 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
 
     override fun startListening(
         languageCode: String,
-        partialResults: Boolean,
     ): Flow<SpeechResult> = callbackFlow {
 
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             log(message = "Speech recognition not available", tag = TAG)
-            trySend(SpeechResult.Error("Bu cihazda konuşma tanıma özelliği kullanılamıyor"))
+            trySend(SpeechResult.Error)
             close()
             return@callbackFlow
         }
@@ -38,7 +37,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
             setRecognitionListener(
                 object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) = log(message = "Ready for speech", tag = TAG)
+                    override fun onReadyForSpeech(params: Bundle?) = Unit /* no-op */
 
                     override fun onBeginningOfSpeech() {
                         log(message = "Beginning of speech", tag = TAG)
@@ -55,24 +54,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                     }
 
                     override fun onError(error: Int) {
-                        trySend(
-                            SpeechResult.Error(
-                                when (error) {
-                                    SpeechRecognizer.ERROR_AUDIO -> "Ses kaydında hata"
-                                    SpeechRecognizer.ERROR_CLIENT -> "İstemci hatası"
-                                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Mikrofon izni gerekli"
-                                    SpeechRecognizer.ERROR_NETWORK -> "Ağ bağlantısı hatası"
-                                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Ağ zaman aşımı"
-                                    SpeechRecognizer.ERROR_NO_MATCH -> "Konuşma anlaşılamadı"
-                                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Konuşma tanıyıcı meşgul"
-                                    SpeechRecognizer.ERROR_SERVER -> "Sunucu hatası"
-                                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Konuşma zaman aşımı"
-                                    else -> "Bilinmeyen hata: $error"
-                                }.also {
-                                    logError(throwable = Exception("Speech recognition error: $error"), message = it, tag = TAG)
-                                }
-                            )
-                        )
+                        trySend(SpeechResult.Error)
                         isListening = false
                     }
 
@@ -98,7 +80,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                             )
                         } else {
                             log(message = "No speech results", tag = TAG)
-                            trySend(SpeechResult.Error("Konuşma anlaşılamadı"))
+                            trySend(SpeechResult.Error)
                         }
 
                         isListening = false
@@ -117,7 +99,6 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, languageCode)
             putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, false)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, partialResults)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
         }
 
@@ -127,7 +108,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
             log(message = "Started listening with language: $languageCode", tag = TAG)
         } catch (e: Exception) {
             logError(throwable = e, message = "Failed to start listening: ${e.message}", tag = TAG)
-            trySend(SpeechResult.Error("Dinleme başlatılamadı: ${e.message}"))
+            trySend(SpeechResult.Error)
             close()
         }
 
@@ -142,14 +123,6 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
             speechRecognizer?.stopListening()
             isListening = false
             log(message = "Speech recognition stopped", tag = TAG)
-        }
-    }
-
-    fun cancelListening() {
-        if (isListening) {
-            speechRecognizer?.cancel()
-            isListening = false
-            log(message = "Speech recognition cancelled", tag = TAG)
         }
     }
 

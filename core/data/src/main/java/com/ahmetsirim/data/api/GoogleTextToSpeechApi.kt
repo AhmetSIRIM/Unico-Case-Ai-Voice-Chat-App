@@ -8,6 +8,7 @@ import retrofit2.http.Query
 
 interface GoogleTextToSpeechApi {
 
+    // TODO: The query here is problematic in terms of security. This will be converted to a header.
     @POST("v1/text:synthesize")
     suspend fun synthesizeSpeech(
         @Query("key")

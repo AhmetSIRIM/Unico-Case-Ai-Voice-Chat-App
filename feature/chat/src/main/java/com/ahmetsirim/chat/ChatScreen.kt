@@ -80,12 +80,7 @@ internal fun ChatScreen(
 
     val permissionRequesterActivityResultLauncher: ManagedActivityResultLauncher<String, Boolean> = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = { permission ->
-            when (permission) {
-                true -> onEvent(ChatContract.UiEvent.OnTheUserIsListened)
-                false -> onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
-            }
-        }
+        onResult = { permission -> if (!permission) onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale) }
     )
 
     LaunchedEffect(Unit) {

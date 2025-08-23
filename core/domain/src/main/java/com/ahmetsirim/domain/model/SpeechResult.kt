@@ -8,5 +8,5 @@ sealed class SpeechResult {
         val confidence: Double,
         val allResults: List<String>,
     ) : SpeechResult()
-    data class Error(val message: String) : SpeechResult()
+    data object Error : SpeechResult()
 }

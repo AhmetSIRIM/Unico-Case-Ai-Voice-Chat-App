@@ -7,7 +7,6 @@ import java.util.Locale
 interface AndroidSpeechRecognizerRepository {
     fun startListening(
         languageCode: String = Locale.getDefault().toString(),
-        partialResults: Boolean = true,
     ): Flow<SpeechResult>
 
     fun stopListening()
