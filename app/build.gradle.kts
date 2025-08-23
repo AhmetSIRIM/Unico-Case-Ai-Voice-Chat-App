@@ -71,8 +71,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-    // Compose Dependencies - Some compose dependencies can be accessed through the `:core:designsystem` module
-    implementation(libs.androidx.activity.compose)
+    // Compose dependencies can be accessed through the `:core:designsystem` module
 
     // Hilt
     implementation(libs.hilt.android)
