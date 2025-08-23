@@ -18,7 +18,7 @@ internal object ApiModule {
     @ViewModelScoped
     internal fun provideGoogleTextToSpeechApi(
         moshiConverterFactory: MoshiConverterFactory,
-        okHttpClient: OkHttpClient,
+        okHttpClient: OkHttpClient
     ): GoogleTextToSpeechApi {
         return Retrofit.Builder()
             .baseUrl(TEXT_TO_SPEECH_BASE_URL)
@@ -29,5 +29,4 @@ internal object ApiModule {
     }
 
     private const val TEXT_TO_SPEECH_BASE_URL = "https://texttospeech.googleapis.com/"
-
 }

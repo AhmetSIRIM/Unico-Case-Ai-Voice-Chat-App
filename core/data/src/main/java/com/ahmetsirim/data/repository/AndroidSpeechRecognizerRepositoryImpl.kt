@@ -11,22 +11,21 @@ import com.ahmetsirim.common.log.logError
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import javax.inject.Inject
 
 class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context
 ) : AndroidSpeechRecognizerRepository {
 
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
 
     override fun startListening(
-        languageCode: String,
+        languageCode: String
     ): Flow<SpeechResult> = callbackFlow {
-
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             log(message = "Speech recognition not available", tag = TAG)
             trySend(SpeechResult.Error)
@@ -37,7 +36,10 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
             setRecognitionListener(
                 object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) = log(message = "onReadyForSpeech triggered", tag = TAG)
+                    override fun onReadyForSpeech(params: Bundle?) = log(
+                        message = "onReadyForSpeech triggered",
+                        tag = TAG
+                    )
 
                     override fun onBeginningOfSpeech() {
                         log(message = "Beginning of speech", tag = TAG)
@@ -46,7 +48,10 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
 
                     override fun onRmsChanged(rmsdB: Float) = Unit /* no-op */
 
-                    override fun onBufferReceived(buffer: ByteArray?) = log(message = "onBufferReceived triggered", tag = TAG)
+                    override fun onBufferReceived(buffer: ByteArray?) = log(
+                        message = "onBufferReceived triggered",
+                        tag = TAG
+                    )
 
                     override fun onEndOfSpeech() {
                         log(message = "End of speech", tag = TAG)
@@ -59,7 +64,9 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                     }
 
                     override fun onResults(results: Bundle?) {
-                        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        val matches = results?.getStringArrayList(
+                            SpeechRecognizer.RESULTS_RECOGNITION
+                        )
                         val confidence = results?.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
 
                         if (!matches.isNullOrEmpty()) {
@@ -86,15 +93,24 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                         isListening = false
                     }
 
-                    override fun onPartialResults(partialResults: Bundle?) = log(message = "onPartialResults triggered", tag = TAG)
+                    override fun onPartialResults(partialResults: Bundle?) = log(
+                        message = "onPartialResults triggered",
+                        tag = TAG
+                    )
 
-                    override fun onEvent(eventType: Int, params: Bundle?) = log(message = "onEvent triggered", tag = TAG)
+                    override fun onEvent(eventType: Int, params: Bundle?) = log(
+                        message = "onEvent triggered",
+                        tag = TAG
+                    )
                 }
             )
         }
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, languageCode)
             putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, false)

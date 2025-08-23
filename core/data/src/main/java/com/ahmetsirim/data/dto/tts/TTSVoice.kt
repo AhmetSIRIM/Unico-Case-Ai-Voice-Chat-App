@@ -8,5 +8,5 @@ data class TTSVoice(
     @param:Json(name = "languageCode")
     val languageCode: String,
     @param:Json(name = "name")
-    val name: String,
+    val name: String
 )

@@ -20,7 +20,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(
         @ApplicationContext
-        context: Context,
+        context: Context
     ): ChatDatabase {
         return Room.databaseBuilder(
             context,
@@ -34,5 +34,4 @@ object DatabaseModule {
 
     @Provides
     fun provideAppSettingsDao(database: ChatDatabase): AppSettingsDao = database.appSettingsDao()
-
 }

@@ -8,7 +8,7 @@ internal class SettingsContract {
     data class UiState(
         val appSettings: AppSettings? = null,
         val isLoading: Boolean = true,
-        val errorState: ErrorState? = null,
+        val errorState: ErrorState? = null
     )
 
     sealed interface UiEvent {

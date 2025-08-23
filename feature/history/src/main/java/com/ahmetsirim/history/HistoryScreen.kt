@@ -51,7 +51,7 @@ internal fun HistoryScreen(
     uiState: HistoryContract.UiState,
     onEvent: (HistoryContract.UiEvent) -> Unit,
     navigateUp: () -> Unit,
-    navigateToChat: (String) -> Unit,
+    navigateToChat: (String) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -73,7 +73,7 @@ internal fun HistoryScreen(
                         text = "Chat History",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
-                        ),
+                        )
                     )
                 },
                 actions = {
@@ -82,10 +82,10 @@ internal fun HistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = "Back"
                         )
                     }
-                },
+                }
             )
         }
     ) { paddingValues ->
@@ -159,7 +159,7 @@ private fun ChatSessionItem(
     chatSession: ChatSession,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
     val dateFormatter = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }

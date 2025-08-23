@@ -74,7 +74,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit,
+    navigateToHistory: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -121,7 +121,7 @@ internal fun ChatScreen(
                         text = "AI Assistant",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
-                        ),
+                        )
                     )
                 },
                 actions = {
@@ -131,7 +131,7 @@ internal fun ChatScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.List,
-                                contentDescription = null,
+                                contentDescription = null
                             )
                         }
 
@@ -140,11 +140,11 @@ internal fun ChatScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
-                                contentDescription = null,
+                                contentDescription = null
                             )
                         }
                     }
-                },
+                }
             )
         },
         bottomBar = {
@@ -153,7 +153,7 @@ internal fun ChatScreen(
                     .systemBarsPadding()
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.Center
             ) {
                 AnimatedMicrophoneButton(
                     speechResult = uiState.speechResult,
@@ -193,12 +193,11 @@ internal fun ChatScreen(
     }
 }
 
-
 @Composable
 private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
 
@@ -302,7 +301,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState,
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -311,7 +310,7 @@ private fun ChatContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(
-            items = messages,
+            items = messages
         ) { message ->
             MessageBubble(message = message)
         }
@@ -329,7 +328,7 @@ private fun ChatContent(
                             topEnd = 16.dp,
                             bottomStart = 16.dp,
                             bottomEnd = 16.dp
-                        ),
+                        )
                     ) {
                         Row(
                             modifier = Modifier.padding(16.dp),
@@ -337,12 +336,12 @@ private fun ChatContent(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp,
+                                strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Yazıyor...",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
@@ -377,8 +376,11 @@ private fun MessageBubble(message: ChatMessage) {
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .let {
-                    if (message.isFromUser) it.padding(start = 48.dp)
-                    else it.padding(end = 48.dp)
+                    if (message.isFromUser) {
+                        it.padding(start = 48.dp)
+                    } else {
+                        it.padding(end = 48.dp)
+                    }
                 }
                 .animateContentSize(
                     animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
@@ -390,20 +392,22 @@ private fun MessageBubble(message: ChatMessage) {
                 bottomEnd = 16.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = if (message.isFromUser)
+                containerColor = if (message.isFromUser) {
                     MaterialTheme.colorScheme.primary
-                else
+                } else {
                     MaterialTheme.colorScheme.surfaceVariant
+                }
             )
         ) {
             Text(
                 text = message.content,
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (message.isFromUser)
+                color = if (message.isFromUser) {
                     MaterialTheme.colorScheme.onPrimary
-                else
-                    MaterialTheme.colorScheme.onSurfaceVariant,
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
                 lineHeight = 20.sp
             )
         }

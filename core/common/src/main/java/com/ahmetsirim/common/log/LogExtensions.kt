@@ -11,7 +11,14 @@ import timber.log.Timber
  * @param tag The log tag (defaults to "UnicoCaseDebug")
  * @return The original object for chaining
  */
-fun <T> T.logDebugThenReturnSimply(message: String = this.toString(), tag: String = "UnicoCaseDebug") = also { Timber.tag(tag).d(message = message) }
+fun <T> T.logDebugThenReturnSimply(
+    message: String = this.toString(),
+    tag: String = "UnicoCaseDebug"
+) = also {
+    Timber.tag(
+        tag
+    ).d(message = message)
+}
 
 /**
  * Logs a message with specified log level using the class name as tag.
@@ -24,7 +31,7 @@ fun <T> T.logDebugThenReturnSimply(message: String = this.toString(), tag: Strin
 inline fun <reified T> T.log(
     message: String,
     level: Int = Log.DEBUG,
-    tag: String = T::class.java.simpleName,
+    tag: String = T::class.java.simpleName
 ) {
     when (level) {
         Log.VERBOSE -> Timber.tag(tag).v(message)
@@ -38,7 +45,7 @@ inline fun <reified T> T.log(
 inline fun <reified T> T.logError(
     throwable: Throwable,
     message: String,
-    tag: String = T::class.java.simpleName,
+    tag: String = T::class.java.simpleName
 ) {
     Timber.tag(tag).e(throwable, message)
 }

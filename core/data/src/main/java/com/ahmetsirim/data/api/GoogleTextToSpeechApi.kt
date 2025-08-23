@@ -14,8 +14,6 @@ interface GoogleTextToSpeechApi {
         @Query("key")
         apiKey: String,
         @Body request:
-        TTSRequest,
+            TTSRequest
     ): TTSResponse
-
 }
-

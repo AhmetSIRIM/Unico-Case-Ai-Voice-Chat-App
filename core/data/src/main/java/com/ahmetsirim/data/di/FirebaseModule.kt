@@ -20,5 +20,4 @@ object FirebaseModule {
             isCrashlyticsCollectionEnabled = !isThisTheDebugBuildVariant
         }
     }
-
 }

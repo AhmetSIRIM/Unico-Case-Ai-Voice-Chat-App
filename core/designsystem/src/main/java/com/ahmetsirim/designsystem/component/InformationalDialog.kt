@@ -36,9 +36,8 @@ fun InformationalDialog(
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int = R.drawable.ic_info_box_error,
     description: String,
-    buttonTextAndActionPair: Pair<String, () -> Unit>,
+    buttonTextAndActionPair: Pair<String, () -> Unit>
 ) {
-
     // In order to solve the problem that InformationalDialog stays on the
     // screen for a long time when navigating to another place with the
     // button in InformationalDialog, this state is managed in the component
@@ -48,26 +47,26 @@ fun InformationalDialog(
 
     BasicAlertDialog(
         modifier = modifier,
-        onDismissRequest = { /* no-op */ },
+        onDismissRequest = { /* no-op */ }
     ) {
         ElevatedCard {
             Column(
                 horizontalAlignment = Alignment.Start,
-                modifier = Modifier.padding(all = 24.dp),
+                modifier = Modifier.padding(all = 24.dp)
             ) {
                 Image(
                     modifier = Modifier
                         .size(60.dp)
                         .align(Alignment.CenterHorizontally),
                     painter = painterResource(icon),
-                    contentDescription = null,
+                    contentDescription = null
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
                     text = description,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -77,7 +76,7 @@ fun InformationalDialog(
                         buttonTextAndActionPair.second()
                         isInformationalDialogOpen = false
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = buttonTextAndActionPair.first,

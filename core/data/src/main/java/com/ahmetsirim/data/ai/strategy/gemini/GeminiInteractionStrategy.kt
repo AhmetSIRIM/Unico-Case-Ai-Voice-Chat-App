@@ -46,12 +46,28 @@ class GeminiInteractionStrategy @Inject constructor() : GenerativeAiModelInterac
                 }
                 .build(),
             safetySettings = listOf(
-                SafetySetting(harmCategory = HarmCategory.HARASSMENT, threshold = BlockThreshold.NONE),
-                SafetySetting(harmCategory = HarmCategory.HATE_SPEECH, threshold = BlockThreshold.NONE),
-                SafetySetting(harmCategory = HarmCategory.SEXUALLY_EXPLICIT, threshold = BlockThreshold.NONE),
-                SafetySetting(harmCategory = HarmCategory.DANGEROUS_CONTENT, threshold = BlockThreshold.NONE)
+                SafetySetting(
+                    harmCategory = HarmCategory.HARASSMENT,
+                    threshold = BlockThreshold.NONE
+                ),
+                SafetySetting(
+                    harmCategory = HarmCategory.HATE_SPEECH,
+                    threshold = BlockThreshold.NONE
+                ),
+                SafetySetting(
+                    harmCategory = HarmCategory.SEXUALLY_EXPLICIT,
+                    threshold = BlockThreshold.NONE
+                ),
+                SafetySetting(
+                    harmCategory = HarmCategory.DANGEROUS_CONTENT,
+                    threshold = BlockThreshold.NONE
+                )
             ),
-            systemInstruction = content { text(PromptsUsedThroughoutTheApplication.FRIENDLY_ASSISTANT_BEHAVIOR_PROMPT) }
+            systemInstruction = content {
+                text(
+                    PromptsUsedThroughoutTheApplication.FRIENDLY_ASSISTANT_BEHAVIOR_PROMPT
+                )
+            }
         )
     }
 
@@ -60,7 +76,9 @@ class GeminiInteractionStrategy @Inject constructor() : GenerativeAiModelInterac
      * @throws IllegalStateException if Gemini fails to generate content
      */
     override suspend fun generateContent(message: String): String {
-        return generativeModel.generateContent(prompt = message).text ?: error("GenAi couldn't generate")
+        return generativeModel.generateContent(prompt = message).text ?: error(
+            "GenAi couldn't generate"
+        )
     }
 
     /**
@@ -78,16 +96,18 @@ class GeminiInteractionStrategy @Inject constructor() : GenerativeAiModelInterac
      */
     override suspend fun generateContentWithHistory(
         message: String,
-        chatHistory: List<ChatMessage>,
+        chatHistory: List<ChatMessage>
     ): String {
-
         val sortedChatHistory = chatHistory.sortedBy { it.timestamp }
-        val mappedChatHistory = sortedChatHistory.map { content(role = if (it.isFromUser) "user" else "model") { text(it.content) } }
+        val mappedChatHistory = sortedChatHistory.map {
+            content(
+                role = if (it.isFromUser) "user" else "model"
+            ) { text(it.content) }
+        }
 
         return generativeModel
             .startChat(history = mappedChatHistory)
             .sendMessage(message)
             .text ?: error("GenAi couldn't generate")
     }
-
 }

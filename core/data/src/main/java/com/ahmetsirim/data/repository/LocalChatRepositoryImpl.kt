@@ -11,7 +11,7 @@ import com.android.identity.util.UUID
 import javax.inject.Inject
 
 class LocalChatRepositoryImpl @Inject constructor(
-    private val chatDao: ChatDao,
+    private val chatDao: ChatDao
 ) : LocalChatRepository {
 
     override suspend fun getAllChatHistory(): Result<List<ChatSession>> {

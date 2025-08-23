@@ -35,9 +35,7 @@ import com.ahmetsirim.navigation.settings.setupSettingsUsageFlow
  */
 @Composable
 fun UnicoCaseAiVoiceChatNavHost(modifier: Modifier = Modifier) {
-
     val navController = rememberNavController().apply {
-
         if (!BuildConfig.DEBUG) return@apply
 
         @SuppressLint("RestrictedApi")

@@ -7,5 +7,5 @@ data class ChatSession(
     val title: String,
     val createdAt: Long,
     val updatedAt: Long,
-    val messages: List<ChatMessage>,
+    val messages: List<ChatMessage>
 )

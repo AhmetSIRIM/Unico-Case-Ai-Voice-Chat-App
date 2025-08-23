@@ -19,5 +19,4 @@ fun ChatContainer(
         navigateToSettings = navigateToSettings,
         navigateToHistory = navigateToHistory
     )
-
 }

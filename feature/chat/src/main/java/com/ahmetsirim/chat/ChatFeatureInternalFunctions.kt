@@ -11,7 +11,7 @@ internal fun handleMicrophonePermissionRequest(
     context: Context,
     onEvent: (ChatContract.UiEvent) -> Unit,
     permissionRequesterActivityResultLauncher: ManagedActivityResultLauncher<String, Boolean>,
-    activity: Activity?,
+    activity: Activity?
 ) {
     when {
         ActivityCompat.checkSelfPermission(
@@ -28,5 +28,4 @@ internal fun handleMicrophonePermissionRequest(
 
         else -> permissionRequesterActivityResultLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
-
 }

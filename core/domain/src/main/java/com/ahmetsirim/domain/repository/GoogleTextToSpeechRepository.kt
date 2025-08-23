@@ -7,5 +7,4 @@ interface GoogleTextToSpeechRepository {
     fun stopSpeaking()
 
     fun cleanup()
-
 }

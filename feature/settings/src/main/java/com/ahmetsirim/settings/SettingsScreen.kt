@@ -39,7 +39,7 @@ import com.ahmetsirim.domain.model.VoiceGenderEnum
 internal fun SettingsScreen(
     uiState: SettingsContract.UiState,
     onEvent: (SettingsContract.UiEvent) -> Unit,
-    navigateUp: () -> Unit,
+    navigateUp: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -61,7 +61,7 @@ internal fun SettingsScreen(
                         text = "Settings",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
-                        ),
+                        )
                     )
                 },
                 actions = {
@@ -70,10 +70,10 @@ internal fun SettingsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
+                            contentDescription = null
                         )
                     }
-                },
+                }
             )
         }
     ) { paddingValues ->
@@ -133,7 +133,7 @@ internal fun SettingsScreen(
 private fun SettingsSection(
     title: String,
     description: String,
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -166,7 +166,7 @@ private fun SelectionItem(
     description: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier

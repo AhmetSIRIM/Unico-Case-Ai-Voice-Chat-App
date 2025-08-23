@@ -21,12 +21,12 @@ import javax.inject.Inject
 @ViewModelScoped
 class FileOperationsHelper @Inject constructor(
     @param:ApplicationContext
-    private val applicationContext: Context,
+    private val applicationContext: Context
 ) {
     fun createImageFile(
         prefix: String = SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date()),
         suffix: String,
-        storageDirectory: File,
+        storageDirectory: File
     ): File {
         return File.createTempFile(
             prefix,
@@ -79,10 +79,9 @@ class FileOperationsHelper @Inject constructor(
         }
     }
 
-
     fun saveImageToDirectory(
         sourceUri: Uri,
-        destinationDir: File,
+        destinationDir: File
     ): Uri {
         require(sourceUri.toString().isNotBlank()) { "Source URI cannot be blank" }
 
@@ -104,7 +103,7 @@ class FileOperationsHelper @Inject constructor(
         file: File,
         sourceUri: Uri,
         maxSizeKB: Long = 500,
-        quality: Int = 80,
+        quality: Int = 80
     ): Uri {
         val bitmap = applicationContext.contentResolver.openInputStream(sourceUri)?.use {
             BitmapFactory.decodeStream(it)
@@ -142,7 +141,6 @@ class FileOperationsHelper @Inject constructor(
         return uri.path?.let { File(it).name } ?: "file"
     }
 
-
     fun getFileSizeInMegabytes(uri: Uri): Double {
         val size = if (uri.scheme == "content") {
             applicationContext.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
@@ -168,5 +166,4 @@ class FileOperationsHelper @Inject constructor(
         private const val AUDIO_EXTENSION = ".mp3"
         private const val DATE_FORMAT = "yyyyMMdd_HHmmss"
     }
-
 }

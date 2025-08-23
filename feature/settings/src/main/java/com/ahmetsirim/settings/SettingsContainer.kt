@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun SettingsContainer(
-    navigateUp: () -> Unit,
+    navigateUp: () -> Unit
 ) {
     val viewModel: SettingsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -17,5 +17,4 @@ fun SettingsContainer(
         onEvent = viewModel::onEvent,
         navigateUp = navigateUp
     )
-
 }

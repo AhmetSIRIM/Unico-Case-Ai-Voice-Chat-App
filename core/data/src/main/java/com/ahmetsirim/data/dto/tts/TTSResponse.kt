@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class TTSResponse(
     @param:Json(name = "audioContent")
-    val audioContent: String,
+    val audioContent: String
 )

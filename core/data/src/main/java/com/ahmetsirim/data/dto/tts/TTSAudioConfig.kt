@@ -12,5 +12,5 @@ data class TTSAudioConfig(
     @param:Json(name = "pitch")
     val pitch: Double = 0.0,
     @param:Json(name = "volumeGainDb")
-    val volumeGainDb: Double = 16.0,
+    val volumeGainDb: Double = 16.0
 )

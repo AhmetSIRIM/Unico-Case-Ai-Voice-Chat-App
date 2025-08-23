@@ -8,5 +8,4 @@ interface GenerativeAiModelRepository {
 
     suspend fun generateContent(message: String): Flow<Response<String>>
     suspend fun generateContentWithContext(message: String, chatHistory: List<ChatMessage>): Flow<Response<String>>
-
 }

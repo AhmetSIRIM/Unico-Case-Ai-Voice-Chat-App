@@ -14,25 +14,25 @@ import com.ahmetsirim.data.dto.tts.TTSVoice
 import com.ahmetsirim.domain.model.VoiceGenderEnum
 import com.ahmetsirim.domain.repository.AppSettingsRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
+import java.io.IOException
+import java.util.Locale
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import java.io.IOException
-import java.util.Locale
-import javax.inject.Inject
 
 class GoogleTextToSpeechRepositoryImpl @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val googleTextToSpeechApi: GoogleTextToSpeechApi,
     private val fileOperationsHelper: FileOperationsHelper,
-    private val mediaPlayer: MediaPlayer,
+    private val mediaPlayer: MediaPlayer
 ) : GoogleTextToSpeechRepository {
 
     private suspend fun synthesizeSpeech(
         text: String,
         voiceGenderEnum: VoiceGenderEnum,
-        language: String = Locale.getDefault().toLanguageTag(),
+        language: String = Locale.getDefault().toLanguageTag()
     ): ByteArray = withContext(Dispatchers.IO) {
         try {
             val response = googleTextToSpeechApi.synthesizeSpeech(
@@ -57,8 +57,16 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
 
             audioBytes
         } catch (e: HttpException) {
-            logError(throwable = e, message = "TTS API HTTP Error: ${e.code()} - ${e.message()}", tag = TAG)
-            logError(throwable = e, message = "Error body: ${e.response()?.errorBody()?.string()}", tag = TAG)
+            logError(
+                throwable = e,
+                message = "TTS API HTTP Error: ${e.code()} - ${e.message()}",
+                tag = TAG
+            )
+            logError(
+                throwable = e,
+                message = "Error body: ${e.response()?.errorBody()?.string()}",
+                tag = TAG
+            )
 
             throw IOException("TTS API HTTP Error: ${e.code()} - ${e.message()}")
         } catch (e: Exception) {
@@ -81,7 +89,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
 
     private fun playAudio(
         audioBytes: ByteArray,
-        callback: (success: Boolean, error: String?) -> Unit,
+        callback: (success: Boolean, error: String?) -> Unit
     ) {
         log("playAudio() called with ${audioBytes.size} bytes", tag = TAG)
 
@@ -90,7 +98,6 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
             log("Temp file created: ${tempFile.absolutePath}", tag = TAG)
 
             setupMediaPlayer(tempFile.absolutePath)
-
         } catch (e: Exception) {
             logError(throwable = e, message = "Play audio error: ${e.message}", tag = TAG)
             callback(false, e.message)
@@ -98,7 +105,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
     }
 
     private fun setupMediaPlayer(
-        filePath: String,
+        filePath: String
     ) {
         try {
             mediaPlayer.reset()
@@ -115,13 +122,16 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
             }
 
             mediaPlayer.setOnErrorListener { _, what, extra ->
-                logError(throwable = Exception("MediaPlayer error: what=$what, extra=$extra"), message = "MediaPlayer error", tag = TAG)
+                logError(
+                    throwable = Exception("MediaPlayer error: what=$what, extra=$extra"),
+                    message = "MediaPlayer error",
+                    tag = TAG
+                )
                 fileOperationsHelper.cleanupTempFile(filePath)
                 true
             }
 
             mediaPlayer.prepareAsync()
-
         } catch (e: Exception) {
             logError(throwable = e, message = "Setup MediaPlayer error: ${e.message}", tag = TAG)
         }
@@ -155,7 +165,6 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
                     log("Audio play result - success: $success, error: $error", tag = TAG)
                 }
             }
-
         } catch (e: Exception) {
             logError(throwable = e, message = "Speak error: ${e.message}", tag = TAG)
             withContext(Dispatchers.Main) {

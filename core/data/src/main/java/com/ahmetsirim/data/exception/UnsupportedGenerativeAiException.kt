@@ -5,4 +5,6 @@ package com.ahmetsirim.data.exception
  *
  * @param modelName The name of the unsupported AI model.
  */
-class UnsupportedGenerativeAiException(modelName: String) : Exception("$modelName not implemented yet")
+class UnsupportedGenerativeAiException(modelName: String) : Exception(
+    "$modelName not implemented yet"
+)

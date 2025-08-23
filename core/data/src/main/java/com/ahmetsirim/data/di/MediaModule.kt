@@ -27,5 +27,4 @@ object MediaModule {
             setVolume(1.0f, 1.0f)
         }
     }
-
 }

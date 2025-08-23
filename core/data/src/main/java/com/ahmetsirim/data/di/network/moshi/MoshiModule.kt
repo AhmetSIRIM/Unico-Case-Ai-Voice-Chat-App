@@ -6,8 +6,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -24,9 +24,8 @@ internal object MoshiModule {
     @Provides
     @Singleton
     internal fun provideMoshiConverterFactory(
-        moshi: Moshi,
+        moshi: Moshi
     ): MoshiConverterFactory {
         return MoshiConverterFactory.create(moshi)
     }
-
 }

@@ -12,6 +12,7 @@ import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
 import com.ahmetsirim.domain.repository.LocalChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
@@ -28,7 +28,7 @@ internal class ChatViewModel @Inject constructor(
     private val androidSpeechRecognizerRepository: AndroidSpeechRecognizerRepository,
     private val googleTextToSpeechRepository: GoogleTextToSpeechRepository,
     private val localChatRepository: LocalChatRepository,
-    private val savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
@@ -46,7 +46,11 @@ internal class ChatViewModel @Inject constructor(
         when (event) {
             ChatContract.UiEvent.OnTheUserIsListened -> startListeningForSpeech()
             ChatContract.UiEvent.UserNotifiedTheError -> _uiState.update { it.copy(errorState = null) }
-            ChatContract.UiEvent.OnShowMicrophonePermissionRationale -> _uiState.update { it.copy(isRecordAudioPermissionRationaleInformationalDialogOpen = !it.isRecordAudioPermissionRationaleInformationalDialogOpen) }
+            ChatContract.UiEvent.OnShowMicrophonePermissionRationale -> _uiState.update {
+                it.copy(
+                    isRecordAudioPermissionRationaleInformationalDialogOpen = !it.isRecordAudioPermissionRationaleInformationalDialogOpen
+                )
+            }
         }
     }
 
@@ -144,5 +148,4 @@ internal class ChatViewModel @Inject constructor(
 
         super.onCleared()
     }
-
 }

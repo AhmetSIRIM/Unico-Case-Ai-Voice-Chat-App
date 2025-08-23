@@ -1,9 +1,9 @@
 package com.ahmetsirim.data.ai
 
-import com.ahmetsirim.domain.model.ai.GenerativeAiModelEnum
 import com.ahmetsirim.data.ai.strategy.GenerativeAiModelInteractionStrategy
 import com.ahmetsirim.data.ai.strategy.gemini.GeminiInteractionStrategy
 import com.ahmetsirim.data.exception.UnsupportedGenerativeAiException
+import com.ahmetsirim.domain.model.ai.GenerativeAiModelEnum
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,15 +25,19 @@ import javax.inject.Singleton
  */
 @Singleton
 class GenerativeAiModelInteractionStrategyFactory @Inject constructor(
-    private val geminiInteractionStrategy: GeminiInteractionStrategy,
+    private val geminiInteractionStrategy: GeminiInteractionStrategy
 //    private val openAIGPTInteractionStrategy: OpenAIGPTInteractionStrategy, TODO: It will be integrated later
 //    private val anthropicClaudeStrategy: AnthropicClaudeStrategy,           TODO: It will be integrated later
 ) {
-    fun createGenerativeAiModelInteractionStrategy(generativeAiModelEnum: GenerativeAiModelEnum): GenerativeAiModelInteractionStrategy {
+    fun createGenerativeAiModelInteractionStrategy(
+        generativeAiModelEnum: GenerativeAiModelEnum
+    ): GenerativeAiModelInteractionStrategy {
         return when (generativeAiModelEnum) {
             GenerativeAiModelEnum.GEMINI -> geminiInteractionStrategy
             GenerativeAiModelEnum.OPENAI -> throw UnsupportedGenerativeAiException("OpenAI GPT")
-            GenerativeAiModelEnum.CLAUDE -> throw UnsupportedGenerativeAiException("Anthropic Claude")
+            GenerativeAiModelEnum.CLAUDE -> throw UnsupportedGenerativeAiException(
+                "Anthropic Claude"
+            )
         }
     }
 }

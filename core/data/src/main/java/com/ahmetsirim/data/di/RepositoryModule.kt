@@ -23,31 +23,30 @@ abstract class RepositoryModule {
     @Binds
     @ViewModelScoped
     abstract fun bindGenerativeAiModelRepository(
-        generativeAiModelRepositoryImpl: GenerativeAiModelRepositoryImpl,
+        generativeAiModelRepositoryImpl: GenerativeAiModelRepositoryImpl
     ): GenerativeAiModelRepository
 
     @Binds
     @ViewModelScoped
     abstract fun bindTextToSpeechRepository(
-        googleTextToSpeechRepositoryImpl: GoogleTextToSpeechRepositoryImpl,
+        googleTextToSpeechRepositoryImpl: GoogleTextToSpeechRepositoryImpl
     ): GoogleTextToSpeechRepository
 
     @Binds
     @ViewModelScoped
     abstract fun bindAndroidSpeechRecognizerRepository(
-        androidSpeechRecognizerRepositoryImpl: AndroidSpeechRecognizerRepositoryImpl,
+        androidSpeechRecognizerRepositoryImpl: AndroidSpeechRecognizerRepositoryImpl
     ): AndroidSpeechRecognizerRepository
 
     @Binds
     @ViewModelScoped
     abstract fun bindAppSettingsRepository(
-        appSettingsRepositoryImpl: AppSettingsRepositoryImpl,
+        appSettingsRepositoryImpl: AppSettingsRepositoryImpl
     ): AppSettingsRepository
 
     @Binds
     @ViewModelScoped
     abstract fun bindLocalChatRepository(
-        localChatRepositoryImpl: LocalChatRepositoryImpl,
+        localChatRepositoryImpl: LocalChatRepositoryImpl
     ): LocalChatRepository
-
 }

@@ -12,5 +12,4 @@ class UnicoCaseAiVoiceChatApplication : Application() {
 
         if (BuildConfig.DEBUG) Timber.plant(tree = Timber.DebugTree())
     }
-
 }

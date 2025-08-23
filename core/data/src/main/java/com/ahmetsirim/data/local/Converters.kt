@@ -16,7 +16,9 @@ class Converters {
     fun fromGenerativeAiModelEnum(value: GenerativeAiModelEnum): String = value.name
 
     @TypeConverter
-    fun toGenerativeAiModelEnum(value: String): GenerativeAiModelEnum = GenerativeAiModelEnum.valueOf(value)
+    fun toGenerativeAiModelEnum(value: String): GenerativeAiModelEnum = GenerativeAiModelEnum.valueOf(
+        value
+    )
 
     @TypeConverter
     fun fromVoiceGenderEnum(value: VoiceGenderEnum): String = value.name

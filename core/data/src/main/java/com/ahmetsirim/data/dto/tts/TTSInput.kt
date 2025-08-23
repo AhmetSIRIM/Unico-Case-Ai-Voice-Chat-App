@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class TTSInput(
     @param:Json(name = "text")
-    val text: String,
+    val text: String
 )

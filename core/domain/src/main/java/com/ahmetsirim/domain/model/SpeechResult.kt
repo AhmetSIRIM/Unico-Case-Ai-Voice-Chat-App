@@ -6,7 +6,7 @@ sealed class SpeechResult {
     data class FinalResult(
         val text: String,
         val confidence: Double,
-        val allResults: List<String>,
+        val allResults: List<String>
     ) : SpeechResult()
     data object Error : SpeechResult()
 }

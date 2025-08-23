@@ -12,7 +12,7 @@ interface AppSettingsDao {
 
     @Query("SELECT * FROM app_settings WHERE id = 'app_settings' LIMIT 1")
     fun getAppSettings(): Flow<AppSettingsEntity?>
+
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertOrUpdateAppSettings(settings: AppSettingsEntity)
-
 }

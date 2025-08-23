@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahmetsirim.domain.model.common.ErrorState
 import com.ahmetsirim.domain.repository.LocalChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -12,11 +13,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 internal class HistoryViewModel @Inject constructor(
-    private val localChatRepository: LocalChatRepository,
+    private val localChatRepository: LocalChatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryContract.UiState())

@@ -8,14 +8,14 @@ import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.ai.GenerativeAiModelEnum
 import com.ahmetsirim.domain.model.common.Response
 import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 class GenerativeAiModelRepositoryImpl @Inject constructor(
     @param:DispatcherQualifier(DispatcherTypeEnum.IO)
     private val ioDispatcher: CoroutineDispatcher,
-    generativeAiModelInteractionStrategyFactory: GenerativeAiModelInteractionStrategyFactory,
+    generativeAiModelInteractionStrategyFactory: GenerativeAiModelInteractionStrategyFactory
 ) : GenerativeAiModelRepository {
 
     /**
@@ -36,7 +36,7 @@ class GenerativeAiModelRepositoryImpl @Inject constructor(
 
     override suspend fun generateContentWithContext(
         message: String,
-        chatHistory: List<ChatMessage>,
+        chatHistory: List<ChatMessage>
     ): Flow<Response<String>> {
         return handleNetworkFlowRequest(ioDispatcher) {
             val response = geminiInteractionStrategy
@@ -48,5 +48,4 @@ class GenerativeAiModelRepositoryImpl @Inject constructor(
             Response.Success(result = response)
         }
     }
-
 }

@@ -5,10 +5,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,7 +25,7 @@ internal object OkHttpModule {
     @Provides
     @Singleton
     internal fun provideOkHttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor,
+        httpLoggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(GENERAL_OKHTTP_TIMEOUT, TimeUnit.SECONDS)
@@ -37,5 +37,4 @@ internal object OkHttpModule {
     }
 
     private const val GENERAL_OKHTTP_TIMEOUT = 10_000L
-
 }

@@ -10,5 +10,5 @@ data class TTSRequest(
     @param:Json(name = "voice")
     val voice: TTSVoice,
     @param:Json(name = "audioConfig")
-    val audioConfig: TTSAudioConfig,
+    val audioConfig: TTSAudioConfig
 )

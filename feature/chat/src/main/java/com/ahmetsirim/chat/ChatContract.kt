@@ -12,7 +12,7 @@ internal class ChatContract {
         val errorState: ErrorState? = null,
         val speechResult: SpeechResult? = null,
         val messages: List<ChatMessage> = emptyList(),
-        val isRecordAudioPermissionRationaleInformationalDialogOpen: Boolean = false,
+        val isRecordAudioPermissionRationaleInformationalDialogOpen: Boolean = false
     )
 
     sealed interface UiEvent {
@@ -20,5 +20,4 @@ internal class ChatContract {
         data object OnShowMicrophonePermissionRationale : UiEvent
         data object OnTheUserIsListened : UiEvent
     }
-
 }

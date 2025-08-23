@@ -8,7 +8,7 @@ internal class HistoryContract {
     data class UiState(
         val isLoading: Boolean = true,
         val chatSessions: List<ChatSession> = emptyList(),
-        val errorState: ErrorState? = null,
+        val errorState: ErrorState? = null
     )
 
     sealed interface UiEvent {

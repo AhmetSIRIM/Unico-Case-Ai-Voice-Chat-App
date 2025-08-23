@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.onStart
  */
 internal inline fun <T : Any> handleNetworkFlowRequest(
     coroutineDispatcher: CoroutineDispatcher,
-    crossinline manipulateTheSuccessResultData: suspend () -> Response<T>,
+    crossinline manipulateTheSuccessResultData: suspend () -> Response<T>
 ): Flow<Response<T>> {
     return flow {
         emit(manipulateTheSuccessResultData())

@@ -6,6 +6,7 @@ import com.ahmetsirim.domain.model.common.ErrorState
 import com.ahmetsirim.domain.model.db.AppSettings
 import com.ahmetsirim.domain.repository.AppSettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +14,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val appSettingsRepository: AppSettingsRepository,
+    private val appSettingsRepository: AppSettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsContract.UiState())
@@ -64,5 +64,4 @@ internal class SettingsViewModel @Inject constructor(
                 }
         }
     }
-
 }

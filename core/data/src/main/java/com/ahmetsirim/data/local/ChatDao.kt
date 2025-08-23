@@ -27,7 +27,10 @@ interface ChatDao {
     suspend fun insertMessage(message: ChatMessageEntity)
 
     @Query("UPDATE chat_sessions SET updatedAt = :timestamp WHERE sessionId = :sessionId")
-    suspend fun updateSessionTimestamp(sessionId: String, timestamp: Long = System.currentTimeMillis())
+    suspend fun updateSessionTimestamp(
+        sessionId: String,
+        timestamp: Long = System.currentTimeMillis()
+    )
 
     @Query("DELETE FROM chat_sessions WHERE sessionId = :sessionId")
     suspend fun deleteChat(sessionId: String)
