@@ -76,6 +76,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
 
+    // Other
+    implementation(libs.identity.jvm)
+
 }
 
 // Configuration block for handling sensitive data securely (e.g., API keys, tokens, passwords)

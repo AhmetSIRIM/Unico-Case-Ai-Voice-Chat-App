@@ -1,11 +1,15 @@
 package com.ahmetsirim.data.di
 
 import com.ahmetsirim.data.repository.AndroidSpeechRecognizerRepositoryImpl
+import com.ahmetsirim.data.repository.AppSettingsRepositoryImpl
 import com.ahmetsirim.data.repository.GenerativeAiModelRepositoryImpl
 import com.ahmetsirim.data.repository.GoogleTextToSpeechRepositoryImpl
+import com.ahmetsirim.data.repository.LocalChatRepositoryImpl
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
+import com.ahmetsirim.domain.repository.AppSettingsRepository
 import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
+import com.ahmetsirim.domain.repository.LocalChatRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,5 +37,17 @@ abstract class RepositoryModule {
     abstract fun bindAndroidSpeechRecognizerRepository(
         androidSpeechRecognizerRepositoryImpl: AndroidSpeechRecognizerRepositoryImpl,
     ): AndroidSpeechRecognizerRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindAppSettingsRepository(
+        appSettingsRepositoryImpl: AppSettingsRepositoryImpl,
+    ): AppSettingsRepository
+
+    @Binds
+    @ViewModelScoped
+    abstract fun bindLocalChatRepository(
+        localChatRepositoryImpl: LocalChatRepositoryImpl,
+    ): LocalChatRepository
 
 }

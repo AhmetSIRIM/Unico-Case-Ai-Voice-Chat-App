@@ -9,7 +9,9 @@ import com.ahmetsirim.domain.model.common.Response
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
+import com.ahmetsirim.domain.repository.LocalChatRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ internal class ChatViewModel @Inject constructor(
     private val generativeAiModelRepository: GenerativeAiModelRepository,
     private val androidSpeechRecognizerRepository: AndroidSpeechRecognizerRepository,
     private val googleTextToSpeechRepository: GoogleTextToSpeechRepository,
+    private val localChatRepository: LocalChatRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatContract.UiState())
@@ -36,7 +39,6 @@ internal class ChatViewModel @Inject constructor(
     fun onEvent(event: ChatContract.UiEvent) {
         when (event) {
             ChatContract.UiEvent.OnTheUserIsListened -> startListeningForSpeech()
-            is ChatContract.UiEvent.UserSendTheMessage -> getMessageWithContext(message = event.message, chatHistory = event.chatHistory)
             ChatContract.UiEvent.UserNotifiedTheError -> _uiState.update { it.copy(errorState = null) }
             ChatContract.UiEvent.OnShowMicrophonePermissionRationale -> _uiState.update { it.copy(isRecordAudioPermissionRationaleInformationalDialogOpen = !it.isRecordAudioPermissionRationaleInformationalDialogOpen) }
         }
@@ -46,7 +48,12 @@ internal class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             androidSpeechRecognizerRepository.startListening().collect { speechResult ->
                 if (speechResult is SpeechResult.FinalResult) {
+                    if (_uiState.value.messages.isEmpty()) createNewChatSession()
+
+                    localChatRepository.saveMessage(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
+
                     _uiState.update { state -> state.copy(speechResult = speechResult) }
+
                     getMessageWithContext(message = speechResult.text, chatHistory = _uiState.value.messages)
                 }
             }
@@ -68,25 +75,52 @@ internal class ChatViewModel @Inject constructor(
                         it.copy(
                             errorState = null,
                             isAiSpeaking = true,
+                            speechResult = null,
                             messages = it.messages + ChatMessage(isFromUser = true, content = message)
                         )
                     }
 
                     is Response.Success -> {
-                        googleTextToSpeechRepository.speak(
-                            text = response.result,
-                            voiceGenderEnum = VoiceGenderEnum.FEMALE
-                        )
+                        coroutineScope {
+                            localChatRepository.saveMessage(
+                                sessionId = _uiState.value.currentSessionId,
+                                message = ChatMessage(
+                                    isFromUser = false,
+                                    content = response.result
+                                )
+                            )
+                        }
+
+                        coroutineScope {
+                            googleTextToSpeechRepository.speak(
+                                text = response.result,
+                                voiceGenderEnum = VoiceGenderEnum.FEMALE
+                            )
+                        }
 
                         _uiState.update {
                             it.copy(
                                 isAiSpeaking = false,
                                 errorState = null,
+                                speechResult = null,
                                 messages = it.messages + ChatMessage(isFromUser = false, content = response.result)
                             )
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun createNewChatSession() {
+        viewModelScope.launch {
+            val sessionId = localChatRepository.createNewChatSession()
+
+            _uiState.update {
+                it.copy(
+                    currentSessionId = sessionId,
+                    messages = emptyList()
+                )
             }
         }
     }

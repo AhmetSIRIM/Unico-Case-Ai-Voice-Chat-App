@@ -57,6 +57,7 @@ generativeAi = "0.9.0"
 # Tools (Timber)
 timber = "5.0.1"
 secretsGradlePluginVersion = "2.0.1"
+identityJvm = "202411.1"
 
 [libraries]
 # AndroidX Core
@@ -115,6 +116,7 @@ google-generative-ai = { module = "com.google.ai.client.generativeai:generativea
 
 # Tools (Timber)
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

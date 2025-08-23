@@ -173,7 +173,6 @@ internal fun ChatScreen(
                 messages = uiState.messages,
                 isAiTyping = uiState.isAiSpeaking,
                 listState = listState,
-                speechResult = uiState.speechResult,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -245,10 +244,9 @@ private fun AnimatedMicrophoneButton(
             val color = when {
                 isAiTyping -> Color(0xFF2196F3)
                 speechResult is SpeechResult.BeginningOfSpeech -> Color(0xFF4CAF50)
-                speechResult is SpeechResult.EndOfSpeech -> Color(0xFFFF9800)
                 speechResult is SpeechResult.Error -> Color(0xFFF44336)
-                speechResult is SpeechResult.FinalResult -> Color(0xFF673AB7)
-                else -> Color(0xFF9E9E9E)
+                speechResult is SpeechResult.FinalResult -> Color(0xFF9E9E9E)
+                else -> Color(0xFF673AB7)
             }
 
             drawCircle(
@@ -291,7 +289,6 @@ private fun ChatContent(
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
     listState: LazyListState,
-    speechResult: SpeechResult?,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

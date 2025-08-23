@@ -37,16 +37,16 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).apply {
             setRecognitionListener(
                 object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) = Unit /* no-op */
+                    override fun onReadyForSpeech(params: Bundle?) = log(message = "onReadyForSpeech triggered", tag = TAG)
 
                     override fun onBeginningOfSpeech() {
                         log(message = "Beginning of speech", tag = TAG)
                         trySend(SpeechResult.BeginningOfSpeech)
                     }
 
-                    override fun onRmsChanged(rmsdB: Float) = Unit /* no-op */
+                    override fun onRmsChanged(rmsdB: Float) = log(message = "onRmsChanged triggered", tag = TAG)
 
-                    override fun onBufferReceived(buffer: ByteArray?) = Unit /* no-op */
+                    override fun onBufferReceived(buffer: ByteArray?) = log(message = "onBufferReceived triggered", tag = TAG)
 
                     override fun onEndOfSpeech() {
                         log(message = "End of speech", tag = TAG)
@@ -86,9 +86,9 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                         isListening = false
                     }
 
-                    override fun onPartialResults(partialResults: Bundle?) = Unit /* no-op */
+                    override fun onPartialResults(partialResults: Bundle?) = log(message = "onPartialResults triggered", tag = TAG)
 
-                    override fun onEvent(eventType: Int, params: Bundle?) = Unit /* no-op */
+                    override fun onEvent(eventType: Int, params: Bundle?) = log(message = "onEvent triggered", tag = TAG)
                 }
             )
         }

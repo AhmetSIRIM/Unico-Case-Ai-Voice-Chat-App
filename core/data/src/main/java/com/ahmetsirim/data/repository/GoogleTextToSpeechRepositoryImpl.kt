@@ -3,7 +3,6 @@ package com.ahmetsirim.data.repository
 import android.media.MediaPlayer
 import android.util.Base64
 import com.ahmetsirim.common.log.log
-import com.ahmetsirim.common.log.logDebugThenReturnSimply
 import com.ahmetsirim.common.log.logError
 import com.ahmetsirim.data.BuildConfig
 import com.ahmetsirim.data.api.GoogleTextToSpeechApi
@@ -39,7 +38,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
                     input = TTSInput(text = text),
                     voice = TTSVoice(
                         languageCode = language,
-                        name = "$language${voiceGenderEnum.voiceName}".logDebugThenReturnSimply()
+                        name = "$language${voiceGenderEnum.voiceName}"
                     ),
                     audioConfig = TTSAudioConfig(
                         audioEncoding = AUDIO_ENCODING,

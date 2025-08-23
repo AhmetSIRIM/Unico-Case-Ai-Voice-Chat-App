@@ -7,6 +7,7 @@ import com.ahmetsirim.domain.model.common.ErrorState
 internal class ChatContract {
 
     data class UiState(
+        val currentSessionId: String = "",
         val isAiSpeaking: Boolean = false,
         val errorState: ErrorState? = null,
         val speechResult: SpeechResult? = null,
@@ -15,7 +16,6 @@ internal class ChatContract {
     )
 
     sealed interface UiEvent {
-        data class UserSendTheMessage(val message: String, val chatHistory: List<ChatMessage>) : UiEvent
         data object UserNotifiedTheError : UiEvent
         data object OnShowMicrophonePermissionRationale : UiEvent
         data object OnTheUserIsListened : UiEvent
