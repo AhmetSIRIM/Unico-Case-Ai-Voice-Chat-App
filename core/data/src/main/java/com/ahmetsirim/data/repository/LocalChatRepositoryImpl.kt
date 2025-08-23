@@ -14,12 +14,12 @@ class LocalChatRepositoryImpl @Inject constructor(
     private val chatDao: ChatDao,
 ) : LocalChatRepository {
 
-    override suspend fun getAllChatHistory(): List<ChatSession> {
-        return chatDao.getAllChatHistory().map { it.toDomain() }
+    override suspend fun getAllChatHistory(): Result<List<ChatSession>> {
+        return runCatching { chatDao.getAllChatHistory().map { it.toDomain() } }
     }
 
-    override suspend fun getChatById(sessionId: String): ChatSession? {
-        return chatDao.getChatById(sessionId)?.toDomain()
+    override suspend fun getChatById(sessionId: String): Result<ChatSession?> {
+        return runCatching { chatDao.getChatById(sessionId)?.toDomain() }
     }
 
     override suspend fun saveMessage(sessionId: String, message: ChatMessage) {

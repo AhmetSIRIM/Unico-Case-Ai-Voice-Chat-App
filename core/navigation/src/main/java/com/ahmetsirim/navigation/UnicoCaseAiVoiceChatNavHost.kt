@@ -52,8 +52,8 @@ fun UnicoCaseAiVoiceChatNavHost(modifier: Modifier = Modifier) {
         navController = navController,
         startDestination = ChatRoute
     ) {
-        setupChatUsageFlow()
+        setupChatUsageFlow(navController)
         setupHistoryUsageFlow()
-        setupSettingsUsageFlow()
+        setupSettingsUsageFlow(navController)
     }
 }

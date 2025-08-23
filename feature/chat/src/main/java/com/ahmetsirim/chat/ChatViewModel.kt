@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
-import com.ahmetsirim.domain.model.VoiceGenderEnum
 import com.ahmetsirim.domain.model.common.Response
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
@@ -91,12 +90,7 @@ internal class ChatViewModel @Inject constructor(
                             )
                         }
 
-                        coroutineScope {
-                            googleTextToSpeechRepository.speak(
-                                text = response.result,
-                                voiceGenderEnum = VoiceGenderEnum.FEMALE
-                            )
-                        }
+                        coroutineScope { googleTextToSpeechRepository.speak(text = response.result) }
 
                         _uiState.update {
                             it.copy(

@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
+    navigateToSettings: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -123,7 +124,7 @@ internal fun ChatScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { TODO() } // Go to the settings screen
+                        onClick = { navigateToSettings() } // Go to the settings screen
                     ) {
                         Icon(
                             imageVector = Icons.Default.Settings,
@@ -425,6 +426,7 @@ private fun ChatScreenPreview() {
 
     ChatScreen(
         uiState = ChatContract.UiState(messages = messages),
-        onEvent = {}
+        onEvent = {},
+        navigateToSettings = {}
     )
 }

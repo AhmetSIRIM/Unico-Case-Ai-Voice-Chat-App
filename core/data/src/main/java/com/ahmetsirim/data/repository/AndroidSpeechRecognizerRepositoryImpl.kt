@@ -44,7 +44,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                         trySend(SpeechResult.BeginningOfSpeech)
                     }
 
-                    override fun onRmsChanged(rmsdB: Float) = log(message = "onRmsChanged triggered", tag = TAG)
+                    override fun onRmsChanged(rmsdB: Float) = Unit /* no-op */
 
                     override fun onBufferReceived(buffer: ByteArray?) = log(message = "onBufferReceived triggered", tag = TAG)
 

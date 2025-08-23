@@ -1,36 +1,20 @@
 package com.ahmetsirim.data.repository
 
-import com.ahmetsirim.data.dto.db.entity.AppSettingsEntity
 import com.ahmetsirim.data.dto.db.entity.toDomain
+import com.ahmetsirim.data.dto.db.entity.toEntity
 import com.ahmetsirim.data.local.AppSettingsDao
 import com.ahmetsirim.domain.model.db.AppSettings
-import com.ahmetsirim.domain.model.VoiceGenderEnum
-import com.ahmetsirim.domain.model.ai.GenerativeAiModelEnum
 import com.ahmetsirim.domain.repository.AppSettingsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AppSettingsRepositoryImpl @Inject constructor(
-    private val appSettingsDao: AppSettingsDao
+    private val appSettingsDao: AppSettingsDao,
 ) : AppSettingsRepository {
 
-    override suspend fun getAppSettings(): AppSettings {
-        val entity = appSettingsDao.getAppSettings()
-            ?: AppSettingsEntity().also {
-                appSettingsDao.insertOrUpdateAppSettings(it)
-            }
-        return entity.toDomain()
-    }
+    override fun getAppSettings(): Flow<Result<AppSettings?>> = appSettingsDao.getAppSettings().map { runCatching { it?.toDomain() } }
 
-    override suspend fun updateGenerativeAiModel(model: GenerativeAiModelEnum) {
-        // Ensure settings exist
-        getAppSettings()
-        appSettingsDao.updateGenerativeAiModel(model.name)
-    }
-
-    override suspend fun updateVoiceGender(voiceGender: VoiceGenderEnum) {
-        // Ensure settings exist
-        getAppSettings()
-        appSettingsDao.updateVoiceGender(voiceGender.name)
-    }
+    override suspend fun insertOrUpdateAppSettings(model: AppSettings) = appSettingsDao.insertOrUpdateAppSettings(model.toEntity())
 
 }

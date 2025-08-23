@@ -12,8 +12,10 @@ import com.ahmetsirim.data.dto.tts.TTSInput
 import com.ahmetsirim.data.dto.tts.TTSRequest
 import com.ahmetsirim.data.dto.tts.TTSVoice
 import com.ahmetsirim.domain.model.VoiceGenderEnum
+import com.ahmetsirim.domain.repository.AppSettingsRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -21,6 +23,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 class GoogleTextToSpeechRepositoryImpl @Inject constructor(
+    private val appSettingsRepository: AppSettingsRepository,
     private val googleTextToSpeechApi: GoogleTextToSpeechApi,
     private val fileOperationsHelper: FileOperationsHelper,
     private val mediaPlayer: MediaPlayer,
@@ -124,8 +127,15 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun speak(text: String, voiceGenderEnum: VoiceGenderEnum) {
+    override suspend fun speak(text: String) {
         log("speak() called with text: '${text.take(50)}...'")
+
+        val voiceGenderEnum = appSettingsRepository
+            .getAppSettings()
+            .firstOrNull()
+            ?.getOrNull()
+            ?.voiceGender
+            ?: VoiceGenderEnum.FEMALE
 
         if (text.isBlank()) {
             log(message = "Text is empty!", tag = TAG)
