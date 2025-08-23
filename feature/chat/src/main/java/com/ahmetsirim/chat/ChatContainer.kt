@@ -6,13 +6,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun ChatContainer() {
+fun ChatContainer(
+    navigateToSettings: () -> Unit,
+    navigateToHistory: () -> Unit
+) {
     val viewModel: ChatViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     ChatScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        navigateToSettings = navigateToSettings,
+        navigateToHistory = navigateToHistory
     )
 
 }

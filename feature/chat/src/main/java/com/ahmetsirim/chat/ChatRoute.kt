@@ -3,4 +3,4 @@ package com.ahmetsirim.chat
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ChatRoute
+data class ChatRoute(val sessionId: String? = null)
