@@ -68,9 +68,6 @@ dependencies {
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp.logging)
 
-    // DataStore Preferences
-    implementation(libs.androidx.datastore.preferences)
-
     // Room Database
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
@@ -78,6 +75,9 @@ dependencies {
     // Firebase Bill of Material (BoM) & Other Firebase Libraries
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
+
+    // Other
+    implementation(libs.identity.jvm)
 
 }
 

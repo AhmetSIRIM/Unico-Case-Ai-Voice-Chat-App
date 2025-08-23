@@ -43,6 +43,7 @@ dependencies {
     api(libs.androidx.compose.ui)
     api(libs.androidx.foundation)
     api(libs.hilt.navigation.compose)
+    api(libs.androidx.activity.compose)
     api(libs.androidx.ui.tooling)
     api(libs.androidx.ui.tooling.preview)
 

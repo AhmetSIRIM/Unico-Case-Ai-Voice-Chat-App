@@ -11,4 +11,9 @@
     <string name="please_check_your_connection_and_try_again">Please check your connection and try again.</string>
     <string name="model_not_yet_supported">This model is not yet supported, please try another option.</string>
 
+    <!--  Error Solution Suggestions  -->
+    <string name="empty" />
+    <string name="try_again">Try again</string>
+    <string name="suggestion_unsupported_model">Select a different model.</string>
+
 </resources>

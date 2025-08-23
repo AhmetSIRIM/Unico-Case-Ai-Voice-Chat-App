@@ -34,3 +34,11 @@ inline fun <reified T> T.log(
         Log.ERROR -> Timber.tag(tag).e(message)
     }
 }
+
+inline fun <reified T> T.logError(
+    throwable: Throwable,
+    message: String,
+    tag: String = T::class.java.simpleName,
+) {
+    Timber.tag(tag).e(throwable, message)
+}
