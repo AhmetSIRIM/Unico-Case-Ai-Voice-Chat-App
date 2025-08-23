@@ -11,7 +11,7 @@ import com.android.identity.util.UUID
 import javax.inject.Inject
 
 class LocalChatRepositoryImpl @Inject constructor(
-    private val chatDao: ChatDao
+    private val chatDao: ChatDao,
 ) : LocalChatRepository {
 
     override suspend fun getAllChatHistory(): Result<List<ChatSession>> {
@@ -28,7 +28,7 @@ class LocalChatRepositoryImpl @Inject constructor(
             chatDao.insertChatSession(
                 ChatSessionEntity(
                     sessionId = sessionId,
-                    title = generateChatTitle(message.content)
+                    title = message.content.take(20)
                 )
             )
         }
@@ -58,12 +58,4 @@ class LocalChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteChat(sessionId: String) = chatDao.deleteChat(sessionId)
-
-    private fun generateChatTitle(firstMessage: String): String {
-        return if (firstMessage.length > 30) {
-            "${firstMessage.take(27)}..."
-        } else {
-            firstMessage.ifEmpty { "New Chat" }
-        }
-    }
 }
