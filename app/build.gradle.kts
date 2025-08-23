@@ -93,7 +93,6 @@ dependencies {
 
     // Tools (Timber)
     implementation(libs.timber)
-
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {

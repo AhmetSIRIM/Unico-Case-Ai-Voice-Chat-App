@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.android.secrets.gradle.plugin)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -18,15 +19,31 @@ android {
 
     buildTypes {
         getByName("debug") {
-            buildConfigField("String", "GEMINI_GENERATIVE_AI_API_KEY", "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: "debug_dummy_key"}\"")
-            buildConfigField("String", "GEMINI_GENERATIVE_AI_MODEL_NAME", "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\"")
+            buildConfigField(
+                "String",
+                "GEMINI_GENERATIVE_AI_API_KEY",
+                "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: "debug_dummy_key"}\""
+            )
+            buildConfigField(
+                "String",
+                "GEMINI_GENERATIVE_AI_MODEL_NAME",
+                "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\""
+            )
         }
 
         release {
             isMinifyEnabled = false
 
-            buildConfigField("String", "GEMINI_GENERATIVE_AI_API_KEY", "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: ""}\"")
-            buildConfigField("String", "GEMINI_GENERATIVE_AI_MODEL_NAME", "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\"")
+            buildConfigField(
+                "String",
+                "GEMINI_GENERATIVE_AI_API_KEY",
+                "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: ""}\""
+            )
+            buildConfigField(
+                "String",
+                "GEMINI_GENERATIVE_AI_MODEL_NAME",
+                "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\""
+            )
         }
     }
     compileOptions {
@@ -78,11 +95,19 @@ dependencies {
 
     // Other
     implementation(libs.identity.jvm)
-
 }
 
 // Configuration block for handling sensitive data securely (e.g., API keys, tokens, passwords)
 secrets {
-    propertiesFileName = "secrets.properties" // Specifies the main file where sensitive data is stored securely.
-    defaultPropertiesFileName = "local.defaults.properties" // Provides a fallback file with default values for missing keys, typically used in local or development environments.
+    // Specifies the main file where sensitive data is stored securely.
+    propertiesFileName = "secrets.properties"
+    // Provides a fallback file with default values for missing keys,
+    // typically used in local or development environments.
+    defaultPropertiesFileName = "local.defaults.properties"
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    outputToConsole.set(true)
 }

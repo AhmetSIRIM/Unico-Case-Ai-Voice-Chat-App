@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -46,5 +47,10 @@ dependencies {
     api(libs.androidx.activity.compose)
     api(libs.androidx.ui.tooling)
     api(libs.androidx.ui.tooling.preview)
+}
 
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    outputToConsole.set(true)
 }

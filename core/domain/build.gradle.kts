@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.ktlint)
 }
 
 dependencies {
@@ -15,5 +16,10 @@ dependencies {
     //
     // Javax
     implementation(libs.javax.inject)
+}
 
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    ignoreFailures.set(false)
+    outputToConsole.set(true)
 }
