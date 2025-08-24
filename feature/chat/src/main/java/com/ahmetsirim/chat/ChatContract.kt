@@ -1,5 +1,6 @@
 package com.ahmetsirim.chat
 
+import androidx.compose.material3.SnackbarResult
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.model.common.ErrorState
@@ -20,5 +21,6 @@ internal class ChatContract {
         data object UserNotifiedTheError : UiEvent
         data object OnShowMicrophonePermissionRationale : UiEvent
         data object OnTheUserIsListened : UiEvent
+        data class OnUserAcceptOrDismissSnackbarInfo(val snackbarResult: SnackbarResult) : UiEvent
     }
 }

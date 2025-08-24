@@ -11,5 +11,5 @@ sealed class SpeechResult {
         val allResults: List<String>
     ) : SpeechResult()
 
-    data object Error : SpeechResult()
+    data class Error(val errorMessageResId: Int) : SpeechResult()
 }

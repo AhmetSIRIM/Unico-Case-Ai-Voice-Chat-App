@@ -8,6 +8,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import com.ahmetsirim.common.log.log
 import com.ahmetsirim.common.log.logError
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,7 +34,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
     ): Flow<SpeechResult> = callbackFlow {
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             log(message = "Speech recognition not available", tag = TAG)
-            trySend(SpeechResult.Error)
+            trySend(SpeechResult.Error(coreR.string.there_was_an_unexpected_error_please_try_again_soon))
             close()
             return@callbackFlow
         }
@@ -66,7 +67,24 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                     }
 
                     override fun onError(error: Int) {
-                        trySend(SpeechResult.Error)
+                        trySend(SpeechResult.Error(errorMessageResId = error))
+                        log(
+                            message = "Error occurred on listening: ${
+                            when (error) {
+                                SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
+                                SpeechRecognizer.ERROR_CLIENT -> "Client-side error"
+                                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Microphone permission required"
+                                SpeechRecognizer.ERROR_NETWORK -> "Network connection error"
+                                SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                                SpeechRecognizer.ERROR_NO_MATCH -> "Speech not understood"
+                                SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Speech recognizer is busy"
+                                SpeechRecognizer.ERROR_SERVER -> "Server-side error"
+                                SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
+                                else -> "Unknown error: $error"
+                            }
+                            }",
+                            tag = TAG
+                        )
                         isListening = false
                     }
 
@@ -94,7 +112,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                             )
                         } else {
                             log(message = "No speech results", tag = TAG)
-                            trySend(SpeechResult.Error)
+                            trySend(SpeechResult.Error(coreR.string.there_was_an_unexpected_error_please_try_again_soon))
                         }
 
                         isListening = false
@@ -131,7 +149,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
             log(message = "Started listening with language: $languageCode", tag = TAG)
         } catch (e: Exception) {
             logError(throwable = e, message = "Failed to start listening: ${e.message}", tag = TAG)
-            trySend(SpeechResult.Error)
+            trySend(SpeechResult.Error(coreR.string.there_was_an_unexpected_error_please_try_again_soon))
             close()
         }
 

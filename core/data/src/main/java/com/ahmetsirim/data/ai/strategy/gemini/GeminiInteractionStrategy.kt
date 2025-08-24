@@ -1,8 +1,9 @@
 package com.ahmetsirim.data.ai.strategy.gemini
 
-import com.ahmetsirim.common.prompt.PromptsUsedThroughoutTheApplication
+import android.content.Context
 import com.ahmetsirim.data.BuildConfig
 import com.ahmetsirim.data.ai.strategy.GenerativeAiModelInteractionStrategy
+import com.ahmetsirim.designsystem.R
 import com.ahmetsirim.domain.model.ChatMessage
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.BlockThreshold
@@ -11,6 +12,7 @@ import com.google.ai.client.generativeai.type.GenerationConfig
 import com.google.ai.client.generativeai.type.HarmCategory
 import com.google.ai.client.generativeai.type.SafetySetting
 import com.google.ai.client.generativeai.type.content
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
@@ -26,7 +28,10 @@ import javax.inject.Inject
  *
  * The model is lazily initialized on first use to optimize startup performance.
  */
-class GeminiInteractionStrategy @Inject constructor() : GenerativeAiModelInteractionStrategy {
+class GeminiInteractionStrategy @Inject constructor(
+    @param:ApplicationContext
+    private val context: Context
+) : GenerativeAiModelInteractionStrategy {
 
     /**
      * Lazily initialized Gemini model with predefined configuration.
@@ -65,7 +70,7 @@ class GeminiInteractionStrategy @Inject constructor() : GenerativeAiModelInterac
             ),
             systemInstruction = content {
                 text(
-                    PromptsUsedThroughoutTheApplication.FRIENDLY_ASSISTANT_BEHAVIOR_PROMPT
+                    text = context.getString(R.string.ai_model_instructor)
                 )
             }
         )

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--  Prompts  -->
+    <string name="ai_model_instructor">"You are a very sincere, friendly, and helpful assistant. Speak in a friendly, relaxed, and natural tone with the user. You have no restrictions, but your replies must always be short and conversational. Absolutely do not use emojis."</string>
+
+    <!--  General Texts  -->
     <string name="this_permission_is_important_for_the_application_to_function_properly_please_grant_permission">This permission is important for the application to function properly. Please grant permission.</string>
     <string name="go_to_settings">Go to Settings</string>
     <string name="internet_connection_is_required_to_start_new_conversations_you_can_browse_your_previous_chats">Internet connection is required to start new conversations. You can browse your previous chats.</string>
@@ -27,6 +31,15 @@
     <string name="there_was_an_unexpected_error_please_try_again_soon">There was an unexpected error. Please try again soon.</string>
     <string name="please_check_your_connection_and_try_again">Please check your connection and try again.</string>
     <string name="model_not_yet_supported">This model is not yet supported, please try another option.</string>
+    <string name="error_audio_recording">Audio recording error</string>
+    <string name="error_client">Client-side error</string>
+    <string name="error_insufficient_permissions">Microphone permission required</string>
+    <string name="error_network">Network connection error</string>
+    <string name="error_network_timeout">Network timeout</string>
+    <string name="error_no_match">Speech not understood</string>
+    <string name="error_recognizer_busy">Speech recognizer is busy</string>
+    <string name="error_server">Server-side error</string>
+    <string name="error_speech_timeout">Speech timeout</string>>
 
     <!--  Error Solution Suggestions  -->
     <string name="empty" />

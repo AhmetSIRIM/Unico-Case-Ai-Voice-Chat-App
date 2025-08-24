@@ -1,5 +1,7 @@
 package com.ahmetsirim.chat
 
+import android.content.Context
+import android.speech.SpeechRecognizer
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,14 +45,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -66,7 +71,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ahmetsirim.common.log.logDebugThenReturnSimply
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
 import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.designsystem.component.InformationalDialog
@@ -88,6 +92,7 @@ internal fun ChatScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val permissionRequesterActivityResultLauncher: ManagedActivityResultLauncher<String, Boolean> = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -163,44 +168,37 @@ internal fun ChatScreen(
             )
         },
         bottomBar = {
-            Box(
+            Row(
                 modifier = Modifier
                     .navigationBarsPadding()
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
                 var lastClickTime by rememberSaveable { mutableLongStateOf(0L) }
                 val currentTime = System.currentTimeMillis()
 
-                val isMicrophoneReadyForListening = currentTime - lastClickTime >= 500 && uiState.messages.lastOrNull()?.isFromUser != true
+                val isMicrophoneReadyForListening = uiState.speechResult == null &&
+                    currentTime - lastClickTime >= 500 &&
+                    uiState.messages.lastOrNull()?.isFromUser != true
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    AnimatedMicrophoneButton(
-                        speechResult = uiState.speechResult,
-                        isAiTyping = uiState.isAiSpeaking,
-                        onClick = {
-                            if (uiState.speechResult == null && isMicrophoneReadyForListening) {
-                                lastClickTime = currentTime
-                                onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply())
-                            }
+                AnimatedMicrophoneButton(
+                    context = context,
+                    snackbarHostState = snackbarHostState,
+                    speechResult = uiState.speechResult,
+                    isAiTyping = uiState.isAiSpeaking,
+                    onEvent = { onEvent(it) },
+                    onClick = {
+                        if (isMicrophoneReadyForListening) {
+                            lastClickTime = currentTime
+                            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
                         }
-                    )
-                }
-
-                if (isMicrophoneReadyForListening && uiState.speechResult is SpeechResult.Error) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 8.dp),
-                        onClick = { onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply()) },
-                        content = { Text(stringResource(coreR.string.try_again)) }
-                    )
-                }
+                    }
+                )
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -230,10 +228,38 @@ internal fun ChatScreen(
 
 @Composable
 private fun AnimatedMicrophoneButton(
+    context: Context,
+    snackbarHostState: SnackbarHostState,
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
+    onEvent: (ChatContract.UiEvent) -> Unit,
     onClick: () -> Unit
 ) {
+    LaunchedEffect(speechResult) {
+        if (speechResult is SpeechResult.Error) {
+            val snackbarResult = snackbarHostState.showSnackbar(
+                message = context.getString(
+                    when (speechResult.errorMessageResId) {
+                        SpeechRecognizer.ERROR_AUDIO -> coreR.string.error_audio_recording
+                        SpeechRecognizer.ERROR_CLIENT -> coreR.string.error_client
+                        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> coreR.string.error_insufficient_permissions
+                        SpeechRecognizer.ERROR_NETWORK -> coreR.string.error_network
+                        SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> coreR.string.error_network_timeout
+                        SpeechRecognizer.ERROR_NO_MATCH -> coreR.string.error_no_match
+                        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> coreR.string.error_recognizer_busy
+                        SpeechRecognizer.ERROR_SERVER -> coreR.string.error_server
+                        SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> coreR.string.error_speech_timeout
+                        else -> coreR.string.there_was_an_unexpected_error_please_try_again_soon
+                    }
+                ),
+                actionLabel = context.getString(coreR.string.try_again),
+                duration = SnackbarDuration.Long
+            )
+
+            onEvent(ChatContract.UiEvent.OnUserAcceptOrDismissSnackbarInfo(snackbarResult))
+        }
+    }
+
     val infiniteTransition = rememberInfiniteTransition()
 
     val aiTypingScale by infiniteTransition.animateFloat(
