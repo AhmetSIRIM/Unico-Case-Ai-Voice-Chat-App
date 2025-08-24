@@ -13,7 +13,6 @@ internal class SettingsContract {
 
     sealed interface UiEvent {
         data class UpdateAppSettings(val newAppSettings: AppSettings) : UiEvent
-        data object LoadSettings : UiEvent
         data object ErrorNotified : UiEvent
     }
 }

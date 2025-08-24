@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -21,9 +22,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,25 +43,32 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ahmetsirim.common.log.logDebugThenReturnSimply
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
-import com.ahmetsirim.designsystem.R
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.designsystem.component.InformationalDialog
 import com.ahmetsirim.designsystem.utility.ResponsivenessCheckerPreview
 import com.ahmetsirim.designsystem.utility.noRippleClickable
@@ -105,11 +113,18 @@ internal fun ChatScreen(
 
     if (uiState.isRecordAudioPermissionRationaleInformationalDialogOpen) {
         InformationalDialog(
-            description = "This permission is important for the application to function properly. Please grant permission.",
-            buttonTextAndActionPair = Pair("Go to Settings") {
+            description = stringResource(coreR.string.this_permission_is_important_for_the_application_to_function_properly_please_grant_permission),
+            buttonTextAndActionPair = Pair(stringResource(coreR.string.go_to_settings)) {
                 context.launchAppDetailsSettings()
                 onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
             }
+        )
+    }
+
+    if (!uiState.isNetworkAvailable) {
+        InformationalDialog(
+            description = stringResource(coreR.string.internet_connection_is_required_to_start_new_conversations_you_can_browse_your_previous_chats),
+            buttonTextAndActionPair = Pair(stringResource(coreR.string.chat_history)) { navigateToHistory() }
         )
     }
 
@@ -118,7 +133,7 @@ internal fun ChatScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "AI Assistant",
+                        text = stringResource(coreR.string.ai_assistant),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -136,7 +151,7 @@ internal fun ChatScreen(
                         }
 
                         IconButton(
-                            onClick = { navigateToSettings() } // Go to the settings screen
+                            onClick = { navigateToSettings() }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
@@ -148,22 +163,42 @@ internal fun ChatScreen(
             )
         },
         bottomBar = {
-            Row(
+            Box(
                 modifier = Modifier
-                    .systemBarsPadding()
+                    .navigationBarsPadding()
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalArrangement = Arrangement.Center
+                    .padding(vertical = 4.dp)
             ) {
-                AnimatedMicrophoneButton(
-                    speechResult = uiState.speechResult,
-                    isAiTyping = uiState.isAiSpeaking,
-                    onClick = {
-                        if (uiState.messages.lastOrNull()?.isFromUser != true && !uiState.isAiSpeaking) {
-                            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
+                var lastClickTime by rememberSaveable { mutableLongStateOf(0L) }
+                val currentTime = System.currentTimeMillis()
+
+                val isMicrophoneReadyForListening = currentTime - lastClickTime >= 500 && uiState.messages.lastOrNull()?.isFromUser != true
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    AnimatedMicrophoneButton(
+                        speechResult = uiState.speechResult,
+                        isAiTyping = uiState.isAiSpeaking,
+                        onClick = {
+                            if (uiState.speechResult == null && isMicrophoneReadyForListening) {
+                                lastClickTime = currentTime
+                                onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply())
+                            }
                         }
-                    }
-                )
+                    )
+                }
+
+                if (isMicrophoneReadyForListening && uiState.speechResult is SpeechResult.Error) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp),
+                        onClick = { onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply()) },
+                        content = { Text(stringResource(coreR.string.try_again)) }
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -174,7 +209,7 @@ internal fun ChatScreen(
         ) {
             uiState.errorState?.let {
                 InformationalDialog(
-                    icon = R.drawable.ic_info_box_error,
+                    icon = coreR.drawable.ic_info_box_error,
                     description = stringResource(it.exceptionMessageResId),
                     buttonTextAndActionPair = Pair(
                         first = stringResource(it.exceptionSolutionSuggestionResId),
@@ -199,63 +234,123 @@ private fun AnimatedMicrophoneButton(
     isAiTyping: Boolean,
     onClick: () -> Unit
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
+    val infiniteTransition = rememberInfiniteTransition()
 
-    val pulseScale by infiniteTransition.animateFloat(
+    val aiTypingScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.2f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_scale"
+        )
+    )
+
+    val aiTypingHue by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
     )
 
     val rippleScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.5f,
+        initialValue = 0.8f,
+        targetValue = 1.8f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
-        ),
-        label = "ripple_scale"
+        )
+    )
+
+    val rms = when (speechResult) {
+        is SpeechResult.RmsChanged -> (speechResult.rmsdb.coerceIn(0f, 30f) / 30f).coerceIn(0f, 1f)
+
+        else -> 0f
+    }
+
+    val rmsAnimatedScale by animateFloatAsState(
+        targetValue = 1f + (rms * 0.4f),
+        animationSpec = tween(durationMillis = 100)
+    )
+
+    val rmsBrightness by animateFloatAsState(
+        targetValue = 0.5f + (rms * 0.5f),
+        animationSpec = tween(durationMillis = 150)
     )
 
     val isActive = speechResult != null || isAiTyping
-    val isListening = speechResult is SpeechResult.BeginningOfSpeech
+    val isListening = speechResult is SpeechResult.BeginningOfSpeech || speechResult is SpeechResult.RmsChanged
 
     val buttonScale by animateFloatAsState(
-        targetValue = if (isActive) pulseScale else 1f,
-        animationSpec = tween(durationMillis = 300),
-        label = "button_scale"
+        targetValue = when {
+            isAiTyping -> aiTypingScale
+            speechResult is SpeechResult.RmsChanged -> rmsAnimatedScale
+            isActive -> 1.1f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 200)
     )
 
     Box(
-        modifier = Modifier.size(120.dp),
+        modifier = Modifier.size(100.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (isListening) {
+        if (isListening || isAiTyping) {
             Canvas(
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(100.dp)
             ) {
-                drawCircle(
-                    color = Color.Green.copy(alpha = 0.3f),
-                    radius = (size.minDimension / 2) * rippleScale
-                )
-                drawCircle(
-                    color = Color.Green.copy(alpha = 0.2f),
-                    radius = (size.minDimension / 2) * (rippleScale * 0.7f)
-                )
+                if (isAiTyping) {
+                    val color = Color.hsv(aiTypingHue, 0.7f, 1f)
+                    drawCircle(
+                        color = color.copy(alpha = 0.15f),
+                        radius = (size.minDimension / 2) * rippleScale
+                    )
+                    drawCircle(
+                        color = color.copy(alpha = 0.25f),
+                        radius = (size.minDimension / 2) * (rippleScale * 0.6f)
+                    )
+                    drawCircle(
+                        color = color.copy(alpha = 0.35f),
+                        radius = (size.minDimension / 2) * (rippleScale * 0.3f)
+                    )
+                } else if (isListening) {
+                    val baseAlpha = 0.2f + (rms * 0.3f)
+                    val waveScale = rippleScale * (0.8f + rms * 0.4f)
+
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha * 0.5f),
+                        radius = (size.minDimension / 2) * waveScale
+                    )
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha * 0.7f),
+                        radius = (size.minDimension / 2) * (waveScale * 0.7f)
+                    )
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha),
+                        radius = (size.minDimension / 2) * (waveScale * 0.4f)
+                    )
+
+                    if (rms > 0.3f) {
+                        drawCircle(
+                            color = Color(0xFF00E676).copy(alpha = rms * 0.6f),
+                            radius = (size.minDimension / 2) * (1f + rms * 0.3f),
+                            style = Stroke(width = 3.dp.toPx())
+                        )
+                    }
+                }
             }
         }
 
         Canvas(
             modifier = Modifier
-                .size((100 * buttonScale).dp)
+                .size((80 * buttonScale).dp)
                 .noRippleClickable { onClick() }
         ) {
             val color = when {
-                isAiTyping -> Color(0xFF2196F3)
+                isAiTyping -> Color.hsv(aiTypingHue, 0.8f, 1f)
+                speechResult is SpeechResult.RmsChanged -> Color(0xFF4CAF50).copy(alpha = rmsBrightness)
+
                 speechResult is SpeechResult.BeginningOfSpeech -> Color(0xFF4CAF50)
                 speechResult is SpeechResult.Error -> Color(0xFFF44336)
                 speechResult is SpeechResult.FinalResult -> Color(0xFF9E9E9E)
@@ -267,24 +362,59 @@ private fun AnimatedMicrophoneButton(
                 radius = size.minDimension / 2
             )
 
+            val innerAlpha = when {
+                speechResult is SpeechResult.RmsChanged -> 0.4f + (rms * 0.6f)
+                isAiTyping -> 0.7f
+                else -> 0.7f
+            }
+
             drawCircle(
-                color = color.copy(alpha = 0.7f),
+                color = color.copy(alpha = innerAlpha),
                 radius = size.minDimension / 3
             )
+
+            if (speechResult is SpeechResult.RmsChanged && rms > 0.2f) {
+                drawCircle(
+                    color = Color.White.copy(alpha = rms * 0.4f),
+                    radius = size.minDimension / 6
+                )
+            }
         }
 
         if (isActive) {
             val statusText = when {
                 isAiTyping -> "🤔"
+                speechResult is SpeechResult.RmsChanged -> {
+                    when {
+                        rms > 0.6f -> "🔊"
+                        rms > 0.3f -> "🔉"
+                        rms > 0.1f -> "🔈"
+                        else -> ""
+                    }
+                }
+
                 speechResult is SpeechResult.BeginningOfSpeech -> ""
                 speechResult is SpeechResult.EndOfSpeech -> ""
-                else -> "🎙"
+                speechResult is SpeechResult.FinalResult -> "✅"
+                speechResult is SpeechResult.Error -> "❕"
+                else -> ""
+            }
+
+            val iconSize = when {
+                speechResult is SpeechResult.RmsChanged -> (20 + rms * 8).sp
+                else -> 24.sp
             }
 
             Text(
                 text = statusText,
-                fontSize = 24.sp,
-                color = Color.White
+                fontSize = iconSize,
+                color = Color.White,
+                modifier = Modifier.graphicsLayer {
+                    if (speechResult is SpeechResult.RmsChanged && rms > 0.4f) {
+                        translationX = (kotlin.random.Random.nextFloat() - 0.5f) * rms * 4f
+                        translationY = (kotlin.random.Random.nextFloat() - 0.5f) * rms * 4f
+                    }
+                }
             )
         } else {
             Text(
@@ -340,7 +470,7 @@ private fun ChatContent(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Yazıyor...",
+                                text = "Thinking...",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

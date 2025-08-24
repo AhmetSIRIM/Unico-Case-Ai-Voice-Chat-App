@@ -8,6 +8,8 @@ import androidx.room.Transaction
 import com.ahmetsirim.data.dto.db.entity.ChatMessageEntity
 import com.ahmetsirim.data.dto.db.entity.ChatSessionEntity
 import com.ahmetsirim.data.dto.db.relation.ChatSessionWithMessages
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Dao
 interface ChatDao {
@@ -26,10 +28,14 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertMessage(message: ChatMessageEntity)
 
-    @Query("UPDATE chat_sessions SET updatedAt = :timestamp WHERE sessionId = :sessionId")
-    suspend fun updateSessionTimestamp(
+    @Query("UPDATE chat_sessions SET updatedAt = :timestamp, title = :title WHERE sessionId = :sessionId")
+    suspend fun updateSessionTimestampAndTitle(
         sessionId: String,
-        timestamp: Long = System.currentTimeMillis()
+        timestamp: Long = System.currentTimeMillis(),
+        title: String = SimpleDateFormat( // TODO: Time operations will be moved to the TimeHelper.kt
+            "MMM dd, yyyy HH:mm",
+            Locale.getDefault()
+        ).format(timestamp)
     )
 
     @Query("DELETE FROM chat_sessions WHERE sessionId = :sessionId")

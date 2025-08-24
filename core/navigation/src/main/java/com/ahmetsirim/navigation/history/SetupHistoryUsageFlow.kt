@@ -13,7 +13,7 @@ internal fun NavGraphBuilder.setupHistoryUsageFlow(navController: NavController)
             navigateUp = { navController.navigateUp() },
             navigateToChat = { sessionId ->
                 navController.navigate(
-                    ChatRoute(sessionId),
+                    route = ChatRoute(sessionId),
                     builder = {
                         popUpTo(ChatRoute::class) {
                             inclusive = true

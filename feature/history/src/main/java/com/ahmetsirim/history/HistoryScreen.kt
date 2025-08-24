@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,13 +39,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.domain.model.db.ChatSession
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,14 +53,15 @@ internal fun HistoryScreen(
     uiState: HistoryContract.UiState,
     onEvent: (HistoryContract.UiEvent) -> Unit,
     navigateUp: () -> Unit,
-    navigateToChat: (String) -> Unit
+    navigateToChat: (String?) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.errorState) {
         uiState.errorState?.let { errorState ->
             snackbarHostState.showSnackbar(
-                message = "Could not load chat history. Please try again."
+                message = context.getString(coreR.string.could_not_load_chat_history_please_try_again)
             )
             onEvent(HistoryContract.UiEvent.ErrorNotified)
         }
@@ -70,7 +73,7 @@ internal fun HistoryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Chat History",
+                        text = stringResource(coreR.string.chat_history),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -82,11 +85,23 @@ internal fun HistoryScreen(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(coreR.string.back)
                         )
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToChat(null) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(coreR.string.new_chat)
+                )
+            }
         }
     ) { paddingValues ->
         when {
@@ -113,12 +128,12 @@ internal fun HistoryScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "No chat history yet",
+                            text = stringResource(coreR.string.no_chat_history_yet),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Start a conversation to see your chat history here",
+                            text = stringResource(coreR.string.start_a_conversation_to_see_your_chat_history_here),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -162,7 +177,6 @@ private fun ChatSessionItem(
     modifier: Modifier = Modifier
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
-    val dateFormatter = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
 
     Card(
         modifier = modifier
@@ -204,14 +218,7 @@ private fun ChatSessionItem(
                 }
 
                 Text(
-                    text = dateFormatter.format(Date(chatSession.updatedAt)),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                // Message count
-                Text(
-                    text = "${chatSession.messages.size} messages",
+                    text = stringResource(coreR.string.messages, chatSession.messages.size),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -223,7 +230,7 @@ private fun ChatSessionItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options"
+                        contentDescription = stringResource(coreR.string.more_options)
                     )
                 }
 
@@ -232,7 +239,7 @@ private fun ChatSessionItem(
                     onDismissRequest = { showDropdownMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text(stringResource(coreR.string.delete)) },
                         onClick = {
                             onDelete()
                             showDropdownMenu = false

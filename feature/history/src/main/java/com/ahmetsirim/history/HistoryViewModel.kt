@@ -3,7 +3,8 @@ package com.ahmetsirim.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetsirim.domain.model.common.ErrorState
-import com.ahmetsirim.domain.repository.LocalChatRepository
+import com.ahmetsirim.domain.usecase.history.DeleteChatUseCase
+import com.ahmetsirim.domain.usecase.history.GetAllChatHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class HistoryViewModel @Inject constructor(
-    private val localChatRepository: LocalChatRepository
+    private val getAllChatHistoryUseCase: GetAllChatHistoryUseCase,
+    private val deleteChatUseCase: DeleteChatUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryContract.UiState())
@@ -30,20 +32,14 @@ internal class HistoryViewModel @Inject constructor(
 
     fun onEvent(event: HistoryContract.UiEvent) {
         when (event) {
-            HistoryContract.UiEvent.LoadChatHistory -> loadChatHistory()
             HistoryContract.UiEvent.ErrorNotified -> clearError()
             is HistoryContract.UiEvent.DeleteChat -> deleteChat(event.sessionId)
-            is HistoryContract.UiEvent.NavigateToChat -> {
-                // Navigation will be handled in the Container/Screen
-            }
         }
     }
 
     private fun loadChatHistory() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
-            localChatRepository.getAllChatHistory()
+            getAllChatHistoryUseCase()
                 .onSuccess { chatSessions ->
                     _uiState.update {
                         it.copy(
@@ -68,8 +64,7 @@ internal class HistoryViewModel @Inject constructor(
 
     private fun deleteChat(sessionId: String) {
         viewModelScope.launch {
-            localChatRepository.deleteChat(sessionId)
-            // Refresh the list after deletion
+            deleteChatUseCase(sessionId)
             loadChatHistory()
         }
     }

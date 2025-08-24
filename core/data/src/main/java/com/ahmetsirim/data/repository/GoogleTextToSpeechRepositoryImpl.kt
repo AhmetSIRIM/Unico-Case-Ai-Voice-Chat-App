@@ -15,7 +15,6 @@ import com.ahmetsirim.domain.model.VoiceGenderEnum
 import com.ahmetsirim.domain.repository.AppSettingsRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
 import java.io.IOException
-import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -32,7 +31,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
     private suspend fun synthesizeSpeech(
         text: String,
         voiceGenderEnum: VoiceGenderEnum,
-        language: String = Locale.getDefault().toLanguageTag()
+        language: String = "en-GB"
     ): ByteArray = withContext(Dispatchers.IO) {
         try {
             val response = googleTextToSpeechApi.synthesizeSpeech(
@@ -41,7 +40,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
                     input = TTSInput(text = text),
                     voice = TTSVoice(
                         languageCode = language,
-                        name = "$language${voiceGenderEnum.voiceName}"
+                        name = "$language-${voiceGenderEnum.voiceName}"
                     ),
                     audioConfig = TTSAudioConfig(
                         audioEncoding = AUDIO_ENCODING,

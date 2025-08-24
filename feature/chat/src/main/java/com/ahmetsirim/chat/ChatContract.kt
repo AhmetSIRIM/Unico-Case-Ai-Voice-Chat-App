@@ -9,6 +9,7 @@ internal class ChatContract {
     data class UiState(
         val currentSessionId: String = "",
         val isAiSpeaking: Boolean = false,
+        val isNetworkAvailable: Boolean = true,
         val errorState: ErrorState? = null,
         val speechResult: SpeechResult? = null,
         val messages: List<ChatMessage> = emptyList(),

@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--  Top Level Routes Names  -->
-    <string name="chat_route">Chat</string>
-    <string name="history_route">History</string>
-    <string name="settings_route">Settings</string>
+    <string name="this_permission_is_important_for_the_application_to_function_properly_please_grant_permission">This permission is important for the application to function properly. Please grant permission.</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="internet_connection_is_required_to_start_new_conversations_you_can_browse_your_previous_chats">Internet connection is required to start new conversations. You can browse your previous chats.</string>
+    <string name="chat_history">Chat History</string>
+    <string name="ai_assistant">AI Assistant</string>
+    <string name="could_not_load_chat_history_please_try_again">Could not load chat history. Please try again.</string>
+    <string name="back">Back</string>
+    <string name="new_chat">New Chat</string>
+    <string name="no_chat_history_yet">No chat history yet</string>
+    <string name="start_a_conversation_to_see_your_chat_history_here">Start a conversation to see your chat history here</string>
+    <string name="messages">%1$d messages</string>
+    <string name="more_options">More options</string>
+    <string name="delete">Delete</string>
+    <string name="settings_could_not_be_loaded_please_try_again">Settings could not be loaded. Please try again.</string>
+    <string name="settings">Settings</string>
+    <string name="voice_gender">Voice Gender</string>
+    <string name="choose_the_voice_gender_for_text_to_speech">Choose the voice gender for text-to-speech</string>
+    <string name="female_voice">Female Voice</string>
+    <string name="male_voice">Male Voice</string>
+    <string name="masculine_voice_tone">Masculine voice tone</string>
+    <string name="feminine_voice_tone">Feminine voice tone</string>
 
     <!--  Error Messages  -->
     <string name="there_was_an_unexpected_error_please_try_again_soon">There was an unexpected error. Please try again soon.</string>

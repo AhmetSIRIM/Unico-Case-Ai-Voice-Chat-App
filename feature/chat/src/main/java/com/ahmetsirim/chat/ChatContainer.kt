@@ -15,8 +15,14 @@ fun ChatContainer(
 
     ChatScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent,
-        navigateToSettings = navigateToSettings,
-        navigateToHistory = navigateToHistory
+        onEvent = { viewModel.onEvent(it) },
+        navigateToSettings = {
+            navigateToSettings()
+            viewModel.cleanup()
+        },
+        navigateToHistory = {
+            navigateToHistory()
+            viewModel.cleanup()
+        }
     )
 }
