@@ -42,7 +42,7 @@ class LocalChatRepositoryImpl @Inject constructor(
         )
 
         // Update session timestamp
-        chatDao.updateSessionTimestamp(sessionId)
+        chatDao.updateSessionTimestampAndTitle(sessionId)
     }
 
     override suspend fun createNewChatSession(): String {

@@ -63,13 +63,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
-import com.ahmetsirim.designsystem.R
 import com.ahmetsirim.designsystem.component.InformationalDialog
 import com.ahmetsirim.designsystem.utility.ResponsivenessCheckerPreview
 import com.ahmetsirim.designsystem.utility.noRippleClickable
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import kotlinx.coroutines.launch
+import com.ahmetsirim.designsystem.R as coreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +77,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit
+    navigateToHistory: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -108,8 +108,8 @@ internal fun ChatScreen(
 
     if (uiState.isRecordAudioPermissionRationaleInformationalDialogOpen) {
         InformationalDialog(
-            description = "This permission is important for the application to function properly. Please grant permission.",
-            buttonTextAndActionPair = Pair("Go to Settings") {
+            description = stringResource(coreR.string.this_permission_is_important_for_the_application_to_function_properly_please_grant_permission),
+            buttonTextAndActionPair = Pair(stringResource(coreR.string.go_to_settings)) {
                 context.launchAppDetailsSettings()
                 onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
             }
@@ -118,8 +118,8 @@ internal fun ChatScreen(
 
     if (!uiState.isNetworkAvailable) {
         InformationalDialog(
-            description = "Internet connection is required to start new conversations. You can browse your previous chats.",
-            buttonTextAndActionPair = Pair("Chat History") { navigateToHistory() }
+            description = stringResource(coreR.string.internet_connection_is_required_to_start_new_conversations_you_can_browse_your_previous_chats),
+            buttonTextAndActionPair = Pair(stringResource(coreR.string.chat_history)) { navigateToHistory() }
         )
     }
 
@@ -128,7 +128,7 @@ internal fun ChatScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "AI Assistant",
+                        text = stringResource(coreR.string.ai_assistant),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -184,7 +184,7 @@ internal fun ChatScreen(
         ) {
             uiState.errorState?.let {
                 InformationalDialog(
-                    icon = R.drawable.ic_info_box_error,
+                    icon = coreR.drawable.ic_info_box_error,
                     description = stringResource(it.exceptionMessageResId),
                     buttonTextAndActionPair = Pair(
                         first = stringResource(it.exceptionSolutionSuggestionResId),
@@ -207,9 +207,9 @@ internal fun ChatScreen(
 private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
+    val infiniteTransition = rememberInfiniteTransition()
 
     val aiTypingScale by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -218,7 +218,6 @@ private fun AnimatedMicrophoneButton(
             animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "ai_typing_scale"
     )
 
     val aiTypingHue by infiniteTransition.animateFloat(
@@ -228,7 +227,6 @@ private fun AnimatedMicrophoneButton(
             animation = tween(durationMillis = 3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "ai_typing_hue"
     )
 
     val rippleScale by infiniteTransition.animateFloat(
@@ -238,7 +236,6 @@ private fun AnimatedMicrophoneButton(
             animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "ripple_scale"
     )
 
     val rms = when (speechResult) {
@@ -250,13 +247,11 @@ private fun AnimatedMicrophoneButton(
     val rmsAnimatedScale by animateFloatAsState(
         targetValue = 1f + (rms * 0.4f),
         animationSpec = tween(durationMillis = 100),
-        label = "rms_scale"
     )
 
     val rmsBrightness by animateFloatAsState(
         targetValue = 0.5f + (rms * 0.5f),
         animationSpec = tween(durationMillis = 150),
-        label = "rms_brightness"
     )
 
     val isActive = speechResult != null || isAiTyping
@@ -270,7 +265,6 @@ private fun AnimatedMicrophoneButton(
             else -> 1f
         },
         animationSpec = tween(durationMillis = 200),
-        label = "button_scale"
     )
 
     Box(
@@ -412,7 +406,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState
+    listState: LazyListState,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -451,7 +445,7 @@ private fun ChatContent(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Yazıyor...",
+                                text = "Thinking...",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

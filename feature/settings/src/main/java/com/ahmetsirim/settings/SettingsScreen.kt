@@ -29,24 +29,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ahmetsirim.domain.model.VoiceGenderEnum
+import com.ahmetsirim.designsystem.R as coreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(
     uiState: SettingsContract.UiState,
     onEvent: (SettingsContract.UiEvent) -> Unit,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.errorState) {
         uiState.errorState?.let { errorState ->
             snackbarHostState.showSnackbar(
-                message = "Settings could not be loaded. Please try again."
+                message = context.getString(coreR.string.settings_could_not_be_loaded_please_try_again)
             )
             onEvent(SettingsContract.UiEvent.ErrorNotified)
         }
@@ -58,7 +62,7 @@ internal fun SettingsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(coreR.string.settings),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
                         )
@@ -99,18 +103,18 @@ internal fun SettingsScreen(
                 uiState.appSettings != null -> {
                     // Voice Gender Selection
                     SettingsSection(
-                        title = "Voice Gender",
-                        description = "Choose the voice gender for text-to-speech"
+                        title = stringResource(coreR.string.voice_gender),
+                        description = stringResource(coreR.string.choose_the_voice_gender_for_text_to_speech)
                     ) {
                         VoiceGenderEnum.entries.forEach { gender ->
                             SelectionItem(
                                 title = when (gender) {
-                                    VoiceGenderEnum.MALE -> "Male Voice"
-                                    VoiceGenderEnum.FEMALE -> "Female Voice"
+                                    VoiceGenderEnum.MALE -> stringResource(coreR.string.male_voice)
+                                    VoiceGenderEnum.FEMALE -> stringResource(coreR.string.female_voice)
                                 },
                                 description = when (gender) {
-                                    VoiceGenderEnum.MALE -> "Masculine voice tone"
-                                    VoiceGenderEnum.FEMALE -> "Feminine voice tone"
+                                    VoiceGenderEnum.MALE -> stringResource(coreR.string.masculine_voice_tone)
+                                    VoiceGenderEnum.FEMALE -> stringResource(coreR.string.feminine_voice_tone)
                                 },
                                 selected = uiState.appSettings.voiceGender == gender,
                                 onClick = {
@@ -133,7 +137,7 @@ internal fun SettingsScreen(
 private fun SettingsSection(
     title: String,
     description: String,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -166,7 +170,7 @@ private fun SelectionItem(
     description: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier

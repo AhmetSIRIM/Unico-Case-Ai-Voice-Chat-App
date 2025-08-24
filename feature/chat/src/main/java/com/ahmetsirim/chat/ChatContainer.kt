@@ -18,11 +18,11 @@ fun ChatContainer(
         onEvent = { viewModel.onEvent(it) },
         navigateToSettings = {
             navigateToSettings()
-            viewModel.resetTheUiState()
+            viewModel.cleanup()
         },
         navigateToHistory = {
             navigateToHistory()
-            viewModel.resetTheUiState()
+            viewModel.cleanup()
         }
     )
 }

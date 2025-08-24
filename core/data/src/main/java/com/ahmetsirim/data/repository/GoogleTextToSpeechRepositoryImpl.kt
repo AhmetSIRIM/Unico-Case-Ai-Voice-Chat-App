@@ -14,25 +14,24 @@ import com.ahmetsirim.data.dto.tts.TTSVoice
 import com.ahmetsirim.domain.model.VoiceGenderEnum
 import com.ahmetsirim.domain.repository.AppSettingsRepository
 import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
-import java.io.IOException
-import java.util.Locale
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.io.IOException
+import javax.inject.Inject
 
 class GoogleTextToSpeechRepositoryImpl @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val googleTextToSpeechApi: GoogleTextToSpeechApi,
     private val fileOperationsHelper: FileOperationsHelper,
-    private val mediaPlayer: MediaPlayer
+    private val mediaPlayer: MediaPlayer,
 ) : GoogleTextToSpeechRepository {
 
     private suspend fun synthesizeSpeech(
         text: String,
         voiceGenderEnum: VoiceGenderEnum,
-        language: String = Locale.getDefault().toLanguageTag()
+        language: String = "en-GB",
     ): ByteArray = withContext(Dispatchers.IO) {
         try {
             val response = googleTextToSpeechApi.synthesizeSpeech(
@@ -41,7 +40,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
                     input = TTSInput(text = text),
                     voice = TTSVoice(
                         languageCode = language,
-                        name = "$language${voiceGenderEnum.voiceName}"
+                        name = "$language-${voiceGenderEnum.voiceName}"
                     ),
                     audioConfig = TTSAudioConfig(
                         audioEncoding = AUDIO_ENCODING,
@@ -89,7 +88,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
 
     private fun playAudio(
         audioBytes: ByteArray,
-        callback: (success: Boolean, error: String?) -> Unit
+        callback: (success: Boolean, error: String?) -> Unit,
     ) {
         log("playAudio() called with ${audioBytes.size} bytes", tag = TAG)
 
@@ -105,7 +104,7 @@ class GoogleTextToSpeechRepositoryImpl @Inject constructor(
     }
 
     private fun setupMediaPlayer(
-        filePath: String
+        filePath: String,
     ) {
         try {
             mediaPlayer.reset()
