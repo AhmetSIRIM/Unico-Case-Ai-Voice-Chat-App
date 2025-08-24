@@ -46,6 +46,22 @@ jobs:
       - name: Decode Google Services JSON
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+          # Plugin'in aradığı diğer konumlara da kopyala
+          mkdir -p app/src/debug
+          cp app/google-services.json app/src/debug/google-services.json
+          cp app/google-services.json app/src/google-services.json
+          echo "Google Services JSON files created:"
+          ls -la app/google-services.json app/src/debug/google-services.json app/src/google-services.json 2>/dev/null || true
+          echo "File content preview:"
+          head -5 app/google-services.json
+          echo "Current directory structure:"
+          find . -name "google-services.json" -type f
+          echo "Google Services JSON created:"
+          ls -la app/google-services.json
+          echo "File content preview:"
+          head -5 app/google-services.json
+          echo "Current directory structure:"
+          find . -name "google-services.json" -type f
 
       - name: Create properties files for lint
         run: |
