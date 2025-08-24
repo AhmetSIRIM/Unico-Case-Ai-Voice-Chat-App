@@ -43,13 +43,17 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ahmetsirim.common.log.logDebugThenReturnSimply
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
 import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.designsystem.component.InformationalDialog
@@ -158,22 +163,42 @@ internal fun ChatScreen(
             )
         },
         bottomBar = {
-            Row(
+            Box(
                 modifier = Modifier
                     .navigationBarsPadding()
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.Center
+                    .padding(vertical = 4.dp)
             ) {
-                AnimatedMicrophoneButton(
-                    speechResult = uiState.speechResult,
-                    isAiTyping = uiState.isAiSpeaking,
-                    onClick = {
-                        if (uiState.messages.lastOrNull()?.isFromUser != true && !uiState.isAiSpeaking) {
-                            onEvent(ChatContract.UiEvent.OnTheUserIsListened)
+                var lastClickTime by rememberSaveable { mutableLongStateOf(0L) }
+                val currentTime = System.currentTimeMillis()
+
+                val isMicrophoneReadyForListening = currentTime - lastClickTime >= 500 && uiState.messages.lastOrNull()?.isFromUser != true
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    AnimatedMicrophoneButton(
+                        speechResult = uiState.speechResult,
+                        isAiTyping = uiState.isAiSpeaking,
+                        onClick = {
+                            if (uiState.speechResult == null && isMicrophoneReadyForListening) {
+                                lastClickTime = currentTime
+                                onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply())
+                            }
                         }
-                    }
-                )
+                    )
+                }
+
+                if (isMicrophoneReadyForListening && uiState.speechResult is SpeechResult.Error) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp),
+                        onClick = { onEvent(ChatContract.UiEvent.OnTheUserIsListened.logDebugThenReturnSimply()) },
+                        content = { Text(stringResource(coreR.string.try_again)) }
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -371,7 +396,7 @@ private fun AnimatedMicrophoneButton(
                 speechResult is SpeechResult.BeginningOfSpeech -> ""
                 speechResult is SpeechResult.EndOfSpeech -> ""
                 speechResult is SpeechResult.FinalResult -> "✅"
-                speechResult is SpeechResult.Error -> "❌"
+                speechResult is SpeechResult.Error -> "❕"
                 else -> ""
             }
 
