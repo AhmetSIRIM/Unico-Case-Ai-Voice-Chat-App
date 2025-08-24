@@ -14,7 +14,7 @@ import com.ahmetsirim.data.dto.db.entity.ChatSessionEntity
         AppSettingsEntity::class
     ],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class ChatDatabase : RoomDatabase() {
