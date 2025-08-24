@@ -14,7 +14,7 @@ fun SettingsContainer(
 
     SettingsScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent,
-        navigateUp = navigateUp
+        onEvent = { viewModel.onEvent(it) },
+        navigateUp = { navigateUp() }
     )
 }

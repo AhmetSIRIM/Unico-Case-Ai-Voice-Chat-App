@@ -160,6 +160,11 @@ internal class ChatViewModel @Inject constructor(
         }
     }
 
+    fun resetTheUiState() {
+        cleanupResourcesUseCase()
+        _uiState.update { ChatContract.UiState() }
+    }
+
     override fun onCleared() {
         cleanupResourcesUseCase()
 

@@ -15,8 +15,8 @@ fun HistoryContainer(
 
     HistoryScreen(
         uiState = uiState,
-        onEvent = viewModel::onEvent,
-        navigateUp = navigateUp,
-        navigateToChat = navigateToChat
+        onEvent = { viewModel.onEvent(it) },
+        navigateUp = { navigateUp() },
+        navigateToChat = { navigateToChat(it) }
     )
 }
