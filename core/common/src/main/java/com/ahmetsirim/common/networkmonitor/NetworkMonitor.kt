@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class NetworkMonitor @Inject constructor(
     @param:ApplicationContext
-    private val applicationContext: Context,
+    private val applicationContext: Context
 ) {
 
     /**
@@ -110,5 +110,4 @@ class NetworkMonitor @Inject constructor(
             awaitClose { connectivityManager.unregisterNetworkCallback(networkCallback) }
         }
     }
-
 }
