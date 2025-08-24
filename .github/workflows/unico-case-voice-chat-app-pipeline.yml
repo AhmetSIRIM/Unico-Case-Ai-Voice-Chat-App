@@ -46,6 +46,10 @@ jobs:
       - name: Decode Google Services JSON
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+          echo "✅ Google Services JSON file created:"
+          ls -la app/google-services.json
+          echo "📄 File content validation (first 3 lines):"
+          head -3 app/google-services.json
 
       - name: Create properties files for lint
         run: |
@@ -98,6 +102,10 @@ jobs:
       - name: Decode Google Services JSON
         run: |
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > app/google-services.json
+          echo "✅ Google Services JSON file created:"
+          ls -la app/google-services.json
+          echo "📄 File content validation (first 3 lines):"
+          head -3 app/google-services.json
 
       - name: Create properties files for tests
         run: |
