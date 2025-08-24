@@ -35,7 +35,7 @@ interface ChatDao {
         title: String = SimpleDateFormat( // TODO: Time operations will be moved to the TimeHelper.kt
             "MMM dd, yyyy HH:mm",
             Locale.getDefault()
-        ).format(timestamp),
+        ).format(timestamp)
     )
 
     @Query("DELETE FROM chat_sessions WHERE sessionId = :sessionId")
