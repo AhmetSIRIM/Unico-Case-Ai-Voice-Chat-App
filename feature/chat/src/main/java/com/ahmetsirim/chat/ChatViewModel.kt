@@ -16,7 +16,6 @@ import com.ahmetsirim.domain.usecase.chat.SaveMessageUseCase
 import com.ahmetsirim.domain.usecase.chat.SpeakTextUseCase
 import com.ahmetsirim.domain.usecase.chat.StartListeningForSpeechUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,7 +69,7 @@ internal class ChatViewModel @Inject constructor(
 
         val messages: List<ChatMessage> = getMessagesBySessionIdUseCase(sessionId = sessionId)
 
-        _uiState.update { it.copy(messages = messages) }
+        _uiState.update { it.copy(messages = messages, currentSessionId = sessionId) }
     }
 
     private fun collectNetworkStatus() {
@@ -87,11 +86,25 @@ internal class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             startListeningForSpeechUseCase().collect { speechResult ->
                 if (speechResult is SpeechResult.FinalResult) {
-                    if (_uiState.value.messages.isEmpty()) createNewChatSession()
+                    if (_uiState.value.messages.isEmpty()) {
+                        val sessionId = createNewChatSessionUseCase()
+
+                        _uiState.update {
+                            it.copy(
+                                currentSessionId = sessionId,
+                                messages = emptyList()
+                            )
+                        }
+                    }
 
                     saveMessageUseCase(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
 
-                    _uiState.update { state -> state.copy(speechResult = speechResult) }
+                    _uiState.update { state ->
+                        state.copy(
+                            speechResult = speechResult,
+                            messages = state.messages + ChatMessage(isFromUser = true, content = speechResult.text)
+                        )
+                    }
 
                     getMessageWithContext(message = speechResult.text, chatHistory = _uiState.value.messages)
                 }
@@ -115,22 +128,19 @@ internal class ChatViewModel @Inject constructor(
                             errorState = null,
                             isAiSpeaking = true,
                             speechResult = null,
-                            messages = it.messages + ChatMessage(isFromUser = true, content = message)
                         )
                     }
 
                     is Response.Success -> {
-                        coroutineScope {
-                            saveMessageUseCase(
-                                sessionId = _uiState.value.currentSessionId,
-                                message = ChatMessage(
-                                    isFromUser = false,
-                                    content = response.result
-                                )
+                        saveMessageUseCase(
+                            sessionId = _uiState.value.currentSessionId,
+                            message = ChatMessage(
+                                isFromUser = false,
+                                content = response.result
                             )
-                        }
+                        )
 
-                        coroutineScope { speakTextUseCase(text = response.result) }
+                        speakTextUseCase(text = response.result)
 
                         _uiState.update {
                             it.copy(
@@ -142,19 +152,6 @@ internal class ChatViewModel @Inject constructor(
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private fun createNewChatSession() {
-        viewModelScope.launch {
-            val sessionId = createNewChatSessionUseCase()
-
-            _uiState.update {
-                it.copy(
-                    currentSessionId = sessionId,
-                    messages = emptyList()
-                )
             }
         }
     }
