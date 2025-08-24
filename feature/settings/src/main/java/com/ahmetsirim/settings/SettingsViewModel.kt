@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahmetsirim.domain.model.common.ErrorState
 import com.ahmetsirim.domain.model.db.AppSettings
-import com.ahmetsirim.domain.repository.AppSettingsRepository
+import com.ahmetsirim.domain.usecase.settings.GetAppSettingsUseCase
+import com.ahmetsirim.domain.usecase.settings.InsertOrUpdateAppSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val appSettingsRepository: AppSettingsRepository
+    private val getAppSettingsUseCase: GetAppSettingsUseCase,
+    private val insertOrUpdateAppSettingsUseCase: InsertOrUpdateAppSettingsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsContract.UiState())
@@ -33,19 +35,19 @@ internal class SettingsViewModel @Inject constructor(
         when (event) {
             SettingsContract.UiEvent.LoadSettings -> loadSettings()
             SettingsContract.UiEvent.ErrorNotified -> _uiState.update { it.copy(errorState = null) }
-            is SettingsContract.UiEvent.UpdateAppSettings -> viewModelScope.launch { appSettingsRepository.insertOrUpdateAppSettings(event.newAppSettings) }
+            is SettingsContract.UiEvent.UpdateAppSettings -> viewModelScope.launch { insertOrUpdateAppSettingsUseCase(appSettings = event.newAppSettings) }
         }
     }
 
     private fun loadSettings() {
         viewModelScope.launch {
-            appSettingsRepository.getAppSettings()
+            getAppSettingsUseCase()
                 .collect { appSettingsResult ->
                     appSettingsResult
                         .onSuccess { nullableAppSettings ->
 
                             nullableAppSettings ?: run {
-                                appSettingsRepository.insertOrUpdateAppSettings(model = AppSettings())
+                                insertOrUpdateAppSettingsUseCase.invoke(appSettings = AppSettings())
                                 return@onSuccess
                             }
 

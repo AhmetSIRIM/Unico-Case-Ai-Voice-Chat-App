@@ -74,7 +74,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit
+    navigateToHistory: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -110,6 +110,13 @@ internal fun ChatScreen(
                 context.launchAppDetailsSettings()
                 onEvent(ChatContract.UiEvent.OnShowMicrophonePermissionRationale)
             }
+        )
+    }
+
+    if (!uiState.isNetworkAvailable) {
+        InformationalDialog(
+            description = "Internet connection is required to start new conversations. You can browse your previous chats.",
+            buttonTextAndActionPair = Pair("Chat History") { navigateToHistory() }
         )
     }
 
@@ -197,7 +204,7 @@ internal fun ChatScreen(
 private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
 
@@ -301,7 +308,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState
+    listState: LazyListState,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

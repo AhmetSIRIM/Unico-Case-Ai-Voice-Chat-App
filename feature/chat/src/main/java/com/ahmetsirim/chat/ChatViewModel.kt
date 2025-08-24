@@ -4,15 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.ahmetsirim.common.networkmonitor.NetworkMonitor
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.model.common.Response
-import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
-import com.ahmetsirim.domain.repository.GenerativeAiModelRepository
-import com.ahmetsirim.domain.repository.GoogleTextToSpeechRepository
-import com.ahmetsirim.domain.repository.LocalChatRepository
+import com.ahmetsirim.domain.usecase.chat.CleanupResourcesUseCase
+import com.ahmetsirim.domain.usecase.chat.CreateNewChatSessionUseCase
+import com.ahmetsirim.domain.usecase.chat.GenerateContentWithContextUseCase
+import com.ahmetsirim.domain.usecase.chat.GetMessagesBySessionIdUseCase
+import com.ahmetsirim.domain.usecase.chat.SaveMessageUseCase
+import com.ahmetsirim.domain.usecase.chat.SpeakTextUseCase
+import com.ahmetsirim.domain.usecase.chat.StartListeningForSpeechUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,21 +24,29 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
-    private val generativeAiModelRepository: GenerativeAiModelRepository,
-    private val androidSpeechRecognizerRepository: AndroidSpeechRecognizerRepository,
-    private val googleTextToSpeechRepository: GoogleTextToSpeechRepository,
-    private val localChatRepository: LocalChatRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val getMessagesBySessionIdUseCase: GetMessagesBySessionIdUseCase,
+    private val startListeningForSpeechUseCase: StartListeningForSpeechUseCase,
+    private val saveMessageUseCase: SaveMessageUseCase,
+    private val generateContentWithContextUseCase: GenerateContentWithContextUseCase,
+    private val createNewChatSessionUseCase: CreateNewChatSessionUseCase,
+    private val speakTextUseCase: SpeakTextUseCase,
+    private val cleanupResourcesUseCase: CleanupResourcesUseCase,
+    private val networkMonitor: NetworkMonitor,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
 
     private val _uiState = MutableStateFlow(ChatContract.UiState())
     val uiState: StateFlow<ChatContract.UiState> = _uiState
-        .onStart { getMessagesBySessionId(sessionId) }
+        .onStart {
+            getMessagesBySessionId(sessionId)
+            collectNetworkStatus()
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
@@ -57,22 +68,28 @@ internal class ChatViewModel @Inject constructor(
     private suspend fun getMessagesBySessionId(sessionId: String?) {
         sessionId ?: return
 
-        val messages: List<ChatMessage> = localChatRepository
-            .getChatById(sessionId)
-            .getOrNull()
-            ?.messages
-            ?: emptyList()
+        val messages: List<ChatMessage> = getMessagesBySessionIdUseCase(sessionId = sessionId)
 
         _uiState.update { it.copy(messages = messages) }
     }
 
+    private fun collectNetworkStatus() {
+        viewModelScope.launch {
+            networkMonitor.getNetworkConnectivityFlow().collect {
+                _uiState.update { state ->
+                    state.copy(isNetworkAvailable = it)
+                }
+            }
+        }
+    }
+
     private fun startListeningForSpeech() {
         viewModelScope.launch {
-            androidSpeechRecognizerRepository.startListening().collect { speechResult ->
+            startListeningForSpeechUseCase().collect { speechResult ->
                 if (speechResult is SpeechResult.FinalResult) {
                     if (_uiState.value.messages.isEmpty()) createNewChatSession()
 
-                    localChatRepository.saveMessage(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
+                    saveMessageUseCase(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
 
                     _uiState.update { state -> state.copy(speechResult = speechResult) }
 
@@ -84,7 +101,7 @@ internal class ChatViewModel @Inject constructor(
 
     private fun getMessageWithContext(message: String, chatHistory: List<ChatMessage>) {
         viewModelScope.launch {
-            generativeAiModelRepository.generateContentWithContext(message = message, chatHistory = chatHistory).collect { response ->
+            generateContentWithContextUseCase(message = message, chatHistory = chatHistory).collect { response ->
                 when (response) {
                     is Response.Error -> _uiState.update {
                         it.copy(
@@ -104,7 +121,7 @@ internal class ChatViewModel @Inject constructor(
 
                     is Response.Success -> {
                         coroutineScope {
-                            localChatRepository.saveMessage(
+                            saveMessageUseCase(
                                 sessionId = _uiState.value.currentSessionId,
                                 message = ChatMessage(
                                     isFromUser = false,
@@ -113,7 +130,7 @@ internal class ChatViewModel @Inject constructor(
                             )
                         }
 
-                        coroutineScope { googleTextToSpeechRepository.speak(text = response.result) }
+                        coroutineScope { speakTextUseCase(text = response.result) }
 
                         _uiState.update {
                             it.copy(
@@ -131,7 +148,7 @@ internal class ChatViewModel @Inject constructor(
 
     private fun createNewChatSession() {
         viewModelScope.launch {
-            val sessionId = localChatRepository.createNewChatSession()
+            val sessionId = createNewChatSessionUseCase()
 
             _uiState.update {
                 it.copy(
@@ -143,8 +160,7 @@ internal class ChatViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        googleTextToSpeechRepository.cleanup()
-        androidSpeechRecognizerRepository.cleanup()
+        cleanupResourcesUseCase()
 
         super.onCleared()
     }
