@@ -1,5 +1,6 @@
 package com.ahmetsirim.chat
 
+import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,7 +36,7 @@ internal class ChatViewModel @Inject constructor(
     private val speakTextUseCase: SpeakTextUseCase,
     private val cleanupResourcesUseCase: CleanupResourcesUseCase,
     private val networkMonitor: NetworkMonitor,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
@@ -60,6 +61,11 @@ internal class ChatViewModel @Inject constructor(
                 it.copy(
                     isRecordAudioPermissionRationaleInformationalDialogOpen = !it.isRecordAudioPermissionRationaleInformationalDialogOpen
                 )
+            }
+
+            is ChatContract.UiEvent.OnUserAcceptOrDismissSnackbarInfo -> when (event.snackbarResult) {
+                SnackbarResult.Dismissed -> _uiState.update { it.copy(speechResult = null) }
+                SnackbarResult.ActionPerformed -> startListeningForSpeech()
             }
         }
     }
