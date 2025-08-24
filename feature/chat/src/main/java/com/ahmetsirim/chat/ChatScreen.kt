@@ -63,13 +63,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.designsystem.component.InformationalDialog
 import com.ahmetsirim.designsystem.utility.ResponsivenessCheckerPreview
 import com.ahmetsirim.designsystem.utility.noRippleClickable
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import kotlinx.coroutines.launch
-import com.ahmetsirim.designsystem.R as coreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +77,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit,
+    navigateToHistory: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -207,7 +207,7 @@ internal fun ChatScreen(
 private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -217,7 +217,7 @@ private fun AnimatedMicrophoneButton(
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
-        ),
+        )
     )
 
     val aiTypingHue by infiniteTransition.animateFloat(
@@ -226,7 +226,7 @@ private fun AnimatedMicrophoneButton(
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        ),
+        )
     )
 
     val rippleScale by infiniteTransition.animateFloat(
@@ -235,7 +235,7 @@ private fun AnimatedMicrophoneButton(
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
-        ),
+        )
     )
 
     val rms = when (speechResult) {
@@ -246,12 +246,12 @@ private fun AnimatedMicrophoneButton(
 
     val rmsAnimatedScale by animateFloatAsState(
         targetValue = 1f + (rms * 0.4f),
-        animationSpec = tween(durationMillis = 100),
+        animationSpec = tween(durationMillis = 100)
     )
 
     val rmsBrightness by animateFloatAsState(
         targetValue = 0.5f + (rms * 0.5f),
-        animationSpec = tween(durationMillis = 150),
+        animationSpec = tween(durationMillis = 150)
     )
 
     val isActive = speechResult != null || isAiTyping
@@ -264,7 +264,7 @@ private fun AnimatedMicrophoneButton(
             isActive -> 1.1f
             else -> 1f
         },
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = 200)
     )
 
     Box(
@@ -406,7 +406,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState,
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

@@ -34,15 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ahmetsirim.domain.model.VoiceGenderEnum
 import com.ahmetsirim.designsystem.R as coreR
+import com.ahmetsirim.domain.model.VoiceGenderEnum
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(
     uiState: SettingsContract.UiState,
     onEvent: (SettingsContract.UiEvent) -> Unit,
-    navigateUp: () -> Unit,
+    navigateUp: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -137,7 +137,7 @@ internal fun SettingsScreen(
 private fun SettingsSection(
     title: String,
     description: String,
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -170,7 +170,7 @@ private fun SelectionItem(
     description: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier

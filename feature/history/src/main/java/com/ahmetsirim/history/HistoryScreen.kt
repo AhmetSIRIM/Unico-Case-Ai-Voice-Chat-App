@@ -44,8 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ahmetsirim.domain.model.db.ChatSession
 import com.ahmetsirim.designsystem.R as coreR
+import com.ahmetsirim.domain.model.db.ChatSession
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +53,7 @@ internal fun HistoryScreen(
     uiState: HistoryContract.UiState,
     onEvent: (HistoryContract.UiEvent) -> Unit,
     navigateUp: () -> Unit,
-    navigateToChat: (String?) -> Unit,
+    navigateToChat: (String?) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -174,7 +174,7 @@ private fun ChatSessionItem(
     chatSession: ChatSession,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
 
