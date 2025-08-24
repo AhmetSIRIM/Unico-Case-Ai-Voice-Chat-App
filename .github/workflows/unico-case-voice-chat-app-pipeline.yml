@@ -69,7 +69,9 @@ jobs:
         if: always()
         with:
           name: ktlint-reports
-          path: app/build/reports/ktlint/
+          path: |
+            app/build/reports/ktlint/**/*
+            build/reports/ktlint/**/*
 
   test:
     name: Unit Tests
@@ -124,16 +126,26 @@ jobs:
         run: ./gradlew jacocoTestReport
         if: always()
 
+      - name: List generated reports
+        run: |
+          echo "📊 Available reports:"
+          find . -name "reports" -type d -exec find {} -name "*.html" \; 2>/dev/null || true
+          echo "📁 Build directories:"
+          find . -name "build" -type d -maxdepth 3 2>/dev/null || true
+        if: always()
+
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
           path: |
-            app/build/reports/tests/
-            **/build/reports/tests/
-            app/build/reports/jacoco/
-            **/build/reports/jacoco/
+            app/build/reports/tests/**/*
+            app/build/test-results/**/*
+            app/build/reports/jacoco/**/*
+            build/reports/tests/**/*
+            build/test-results/**/*
+            build/reports/jacoco/**/*
 
   summary:
     name: Pipeline Summary
