@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -53,6 +54,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,7 +77,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit,
+    navigateToHistory: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -143,7 +146,7 @@ internal fun ChatScreen(
                         }
 
                         IconButton(
-                            onClick = { navigateToSettings() } // Go to the settings screen
+                            onClick = { navigateToSettings() }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
@@ -204,36 +207,69 @@ internal fun ChatScreen(
 private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "mic_animation")
 
-    val pulseScale by infiniteTransition.animateFloat(
+    val aiTypingScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.2f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "pulse_scale"
+        label = "ai_typing_scale"
+    )
+
+    val aiTypingHue by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "ai_typing_hue"
     )
 
     val rippleScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.5f,
+        initialValue = 0.8f,
+        targetValue = 1.8f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "ripple_scale"
     )
 
+    val rms = when (speechResult) {
+        is SpeechResult.RmsChanged -> (speechResult.rmsdb.coerceIn(0f, 30f) / 30f).coerceIn(0f, 1f)
+
+        else -> 0f
+    }
+
+    val rmsAnimatedScale by animateFloatAsState(
+        targetValue = 1f + (rms * 0.4f),
+        animationSpec = tween(durationMillis = 100),
+        label = "rms_scale"
+    )
+
+    val rmsBrightness by animateFloatAsState(
+        targetValue = 0.5f + (rms * 0.5f),
+        animationSpec = tween(durationMillis = 150),
+        label = "rms_brightness"
+    )
+
     val isActive = speechResult != null || isAiTyping
-    val isListening = speechResult is SpeechResult.BeginningOfSpeech
+    val isListening = speechResult is SpeechResult.BeginningOfSpeech || speechResult is SpeechResult.RmsChanged
 
     val buttonScale by animateFloatAsState(
-        targetValue = if (isActive) pulseScale else 1f,
-        animationSpec = tween(durationMillis = 300),
+        targetValue = when {
+            isAiTyping -> aiTypingScale
+            speechResult is SpeechResult.RmsChanged -> rmsAnimatedScale
+            isActive -> 1.1f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 200),
         label = "button_scale"
     )
 
@@ -241,18 +277,49 @@ private fun AnimatedMicrophoneButton(
         modifier = Modifier.size(120.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (isListening) {
+        if (isListening || isAiTyping) {
             Canvas(
                 modifier = Modifier.size(120.dp)
             ) {
-                drawCircle(
-                    color = Color.Green.copy(alpha = 0.3f),
-                    radius = (size.minDimension / 2) * rippleScale
-                )
-                drawCircle(
-                    color = Color.Green.copy(alpha = 0.2f),
-                    radius = (size.minDimension / 2) * (rippleScale * 0.7f)
-                )
+                if (isAiTyping) {
+                    val color = Color.hsv(aiTypingHue, 0.7f, 1f)
+                    drawCircle(
+                        color = color.copy(alpha = 0.15f),
+                        radius = (size.minDimension / 2) * rippleScale
+                    )
+                    drawCircle(
+                        color = color.copy(alpha = 0.25f),
+                        radius = (size.minDimension / 2) * (rippleScale * 0.6f)
+                    )
+                    drawCircle(
+                        color = color.copy(alpha = 0.35f),
+                        radius = (size.minDimension / 2) * (rippleScale * 0.3f)
+                    )
+                } else if (isListening) {
+                    val baseAlpha = 0.2f + (rms * 0.3f)
+                    val waveScale = rippleScale * (0.8f + rms * 0.4f)
+
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha * 0.5f),
+                        radius = (size.minDimension / 2) * waveScale
+                    )
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha * 0.7f),
+                        radius = (size.minDimension / 2) * (waveScale * 0.7f)
+                    )
+                    drawCircle(
+                        color = Color.Green.copy(alpha = baseAlpha),
+                        radius = (size.minDimension / 2) * (waveScale * 0.4f)
+                    )
+
+                    if (rms > 0.3f) {
+                        drawCircle(
+                            color = Color(0xFF00E676).copy(alpha = rms * 0.6f),
+                            radius = (size.minDimension / 2) * (1f + rms * 0.3f),
+                            style = Stroke(width = 3.dp.toPx())
+                        )
+                    }
+                }
             }
         }
 
@@ -262,7 +329,9 @@ private fun AnimatedMicrophoneButton(
                 .noRippleClickable { onClick() }
         ) {
             val color = when {
-                isAiTyping -> Color(0xFF2196F3)
+                isAiTyping -> Color.hsv(aiTypingHue, 0.8f, 1f)
+                speechResult is SpeechResult.RmsChanged -> Color(0xFF4CAF50).copy(alpha = rmsBrightness)
+
                 speechResult is SpeechResult.BeginningOfSpeech -> Color(0xFF4CAF50)
                 speechResult is SpeechResult.Error -> Color(0xFFF44336)
                 speechResult is SpeechResult.FinalResult -> Color(0xFF9E9E9E)
@@ -274,24 +343,59 @@ private fun AnimatedMicrophoneButton(
                 radius = size.minDimension / 2
             )
 
+            val innerAlpha = when {
+                speechResult is SpeechResult.RmsChanged -> 0.4f + (rms * 0.6f)
+                isAiTyping -> 0.7f
+                else -> 0.7f
+            }
+
             drawCircle(
-                color = color.copy(alpha = 0.7f),
+                color = color.copy(alpha = innerAlpha),
                 radius = size.minDimension / 3
             )
+
+            if (speechResult is SpeechResult.RmsChanged && rms > 0.2f) {
+                drawCircle(
+                    color = Color.White.copy(alpha = rms * 0.4f),
+                    radius = size.minDimension / 6
+                )
+            }
         }
 
         if (isActive) {
             val statusText = when {
                 isAiTyping -> "🤔"
+                speechResult is SpeechResult.RmsChanged -> {
+                    when {
+                        rms > 0.6f -> "🔊"
+                        rms > 0.3f -> "🔉"
+                        rms > 0.1f -> "🔈"
+                        else -> ""
+                    }
+                }
+
                 speechResult is SpeechResult.BeginningOfSpeech -> ""
                 speechResult is SpeechResult.EndOfSpeech -> ""
-                else -> "🎙"
+                speechResult is SpeechResult.FinalResult -> "✅"
+                speechResult is SpeechResult.Error -> "❌"
+                else -> ""
+            }
+
+            val iconSize = when {
+                speechResult is SpeechResult.RmsChanged -> (20 + rms * 8).sp
+                else -> 24.sp
             }
 
             Text(
                 text = statusText,
-                fontSize = 24.sp,
-                color = Color.White
+                fontSize = iconSize,
+                color = Color.White,
+                modifier = Modifier.graphicsLayer {
+                    if (speechResult is SpeechResult.RmsChanged && rms > 0.4f) {
+                        translationX = (kotlin.random.Random.nextFloat() - 0.5f) * rms * 4f
+                        translationY = (kotlin.random.Random.nextFloat() - 0.5f) * rms * 4f
+                    }
+                }
             )
         } else {
             Text(
@@ -308,7 +412,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState,
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

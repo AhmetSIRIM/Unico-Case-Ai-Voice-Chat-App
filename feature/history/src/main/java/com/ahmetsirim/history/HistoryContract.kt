@@ -12,9 +12,7 @@ internal class HistoryContract {
     )
 
     sealed interface UiEvent {
-        data object LoadChatHistory : UiEvent
         data class DeleteChat(val sessionId: String) : UiEvent
-        data class NavigateToChat(val sessionId: String) : UiEvent
         data object ErrorNotified : UiEvent
     }
 }

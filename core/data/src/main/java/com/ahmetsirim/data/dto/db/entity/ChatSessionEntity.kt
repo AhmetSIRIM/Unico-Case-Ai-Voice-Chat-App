@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ahmetsirim.data.dto.db.relation.ChatSessionWithMessages
 import com.ahmetsirim.domain.model.db.ChatSession
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Entity(tableName = "chat_sessions")
 data class ChatSessionEntity(
@@ -11,7 +13,10 @@ data class ChatSessionEntity(
     val sessionId: String,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
-    val title: String = "New Chat"
+    val title: String = SimpleDateFormat( // TODO: Time operations will be moved to the TimeHelper.kt
+        "MMM dd, yyyy HH:mm",
+        Locale.getDefault()
+    ).format(System.currentTimeMillis())
 )
 
 fun ChatSessionEntity.toDomain(): ChatSession {

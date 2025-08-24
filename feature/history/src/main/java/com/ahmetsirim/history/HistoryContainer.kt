@@ -8,7 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun HistoryContainer(
     navigateUp: () -> Unit,
-    navigateToChat: (String) -> Unit
+    navigateToChat: (String?) -> Unit
 ) {
     val viewModel: HistoryViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

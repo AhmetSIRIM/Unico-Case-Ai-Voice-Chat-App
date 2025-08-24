@@ -32,19 +32,13 @@ internal class HistoryViewModel @Inject constructor(
 
     fun onEvent(event: HistoryContract.UiEvent) {
         when (event) {
-            HistoryContract.UiEvent.LoadChatHistory -> loadChatHistory()
             HistoryContract.UiEvent.ErrorNotified -> clearError()
             is HistoryContract.UiEvent.DeleteChat -> deleteChat(event.sessionId)
-            is HistoryContract.UiEvent.NavigateToChat -> {
-                // Navigation will be handled in the Container/Screen
-            }
         }
     }
 
     private fun loadChatHistory() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
             getAllChatHistoryUseCase()
                 .onSuccess { chatSessions ->
                     _uiState.update {
@@ -71,7 +65,6 @@ internal class HistoryViewModel @Inject constructor(
     private fun deleteChat(sessionId: String) {
         viewModelScope.launch {
             deleteChatUseCase(sessionId)
-            // Refresh the list after deletion
             loadChatHistory()
         }
     }

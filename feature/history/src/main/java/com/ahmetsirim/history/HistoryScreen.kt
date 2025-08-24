@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +43,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ahmetsirim.domain.model.db.ChatSession
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +50,7 @@ internal fun HistoryScreen(
     uiState: HistoryContract.UiState,
     onEvent: (HistoryContract.UiEvent) -> Unit,
     navigateUp: () -> Unit,
-    navigateToChat: (String) -> Unit
+    navigateToChat: (String?) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -87,6 +86,18 @@ internal fun HistoryScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigateToChat(null) },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "New Chat"
+                )
+            }
         }
     ) { paddingValues ->
         when {
@@ -162,7 +173,6 @@ private fun ChatSessionItem(
     modifier: Modifier = Modifier
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
-    val dateFormatter = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
 
     Card(
         modifier = modifier
@@ -203,13 +213,6 @@ private fun ChatSessionItem(
                     }
                 }
 
-                Text(
-                    text = dateFormatter.format(Date(chatSession.updatedAt)),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                // Message count
                 Text(
                     text = "${chatSession.messages.size} messages",
                     style = MaterialTheme.typography.labelSmall,

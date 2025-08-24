@@ -27,8 +27,7 @@ class LocalChatRepositoryImpl @Inject constructor(
         if (chatDao.getChatById(sessionId) == null) {
             chatDao.insertChatSession(
                 ChatSessionEntity(
-                    sessionId = sessionId,
-                    title = message.content.take(20)
+                    sessionId = sessionId
                 )
             )
         }
@@ -50,8 +49,7 @@ class LocalChatRepositoryImpl @Inject constructor(
         val sessionId = UUID.Companion.randomUUID().toString()
         chatDao.insertChatSession(
             ChatSessionEntity(
-                sessionId = sessionId,
-                title = "New Chat"
+                sessionId = sessionId
             )
         )
         return sessionId

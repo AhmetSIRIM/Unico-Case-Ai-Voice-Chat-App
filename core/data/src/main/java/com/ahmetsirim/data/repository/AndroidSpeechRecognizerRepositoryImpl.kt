@@ -12,9 +12,13 @@ import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.sample
 
 class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
@@ -23,6 +27,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
 
+    @OptIn(FlowPreview::class)
     override fun startListening(
         languageCode: String
     ): Flow<SpeechResult> = callbackFlow {
@@ -46,7 +51,9 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                         trySend(SpeechResult.BeginningOfSpeech)
                     }
 
-                    override fun onRmsChanged(rmsdB: Float) = Unit /* no-op */
+                    override fun onRmsChanged(rmsdB: Float) {
+                        trySend(SpeechResult.RmsChanged(rmsdB))
+                    }
 
                     override fun onBufferReceived(buffer: ByteArray?) = log(
                         message = "onBufferReceived triggered",
@@ -132,7 +139,12 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
             log(message = "Stopping speech recognition", tag = TAG)
             stopListening()
         }
-    }
+    }.distinctUntilChanged { old, new ->
+        when (old is SpeechResult.RmsChanged && new is SpeechResult.RmsChanged) {
+            true -> abs(old.rmsdb - new.rmsdb) < 0.75f
+            false -> false
+        }
+    }.sample(periodMillis = 250L)
 
     override fun stopListening() {
         if (isListening) {

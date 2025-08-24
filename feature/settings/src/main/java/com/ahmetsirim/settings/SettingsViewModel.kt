@@ -33,7 +33,6 @@ internal class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsContract.UiEvent) {
         when (event) {
-            SettingsContract.UiEvent.LoadSettings -> loadSettings()
             SettingsContract.UiEvent.ErrorNotified -> _uiState.update { it.copy(errorState = null) }
             is SettingsContract.UiEvent.UpdateAppSettings -> viewModelScope.launch { insertOrUpdateAppSettingsUseCase(appSettings = event.newAppSettings) }
         }

@@ -16,6 +16,7 @@ import com.ahmetsirim.domain.usecase.chat.SaveMessageUseCase
 import com.ahmetsirim.domain.usecase.chat.SpeakTextUseCase
 import com.ahmetsirim.domain.usecase.chat.StartListeningForSpeechUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
@@ -35,7 +35,7 @@ internal class ChatViewModel @Inject constructor(
     private val speakTextUseCase: SpeakTextUseCase,
     private val cleanupResourcesUseCase: CleanupResourcesUseCase,
     private val networkMonitor: NetworkMonitor,
-    savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
@@ -85,28 +85,32 @@ internal class ChatViewModel @Inject constructor(
     private fun startListeningForSpeech() {
         viewModelScope.launch {
             startListeningForSpeechUseCase().collect { speechResult ->
-                if (speechResult is SpeechResult.FinalResult) {
-                    if (_uiState.value.messages.isEmpty()) {
-                        val sessionId = createNewChatSessionUseCase()
+                when (speechResult) {
+                    is SpeechResult.FinalResult -> {
+                        if (_uiState.value.messages.isEmpty()) {
+                            val sessionId = createNewChatSessionUseCase()
 
-                        _uiState.update {
-                            it.copy(
-                                currentSessionId = sessionId,
-                                messages = emptyList()
+                            _uiState.update {
+                                it.copy(
+                                    currentSessionId = sessionId,
+                                    messages = emptyList()
+                                )
+                            }
+                        }
+
+                        saveMessageUseCase(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
+
+                        _uiState.update { state ->
+                            state.copy(
+                                speechResult = speechResult,
+                                messages = state.messages + ChatMessage(isFromUser = true, content = speechResult.text)
                             )
                         }
+
+                        getMessageWithContext(message = speechResult.text, chatHistory = _uiState.value.messages)
                     }
 
-                    saveMessageUseCase(_uiState.value.currentSessionId, ChatMessage(isFromUser = true, content = speechResult.text))
-
-                    _uiState.update { state ->
-                        state.copy(
-                            speechResult = speechResult,
-                            messages = state.messages + ChatMessage(isFromUser = true, content = speechResult.text)
-                        )
-                    }
-
-                    getMessageWithContext(message = speechResult.text, chatHistory = _uiState.value.messages)
+                    else -> _uiState.update { it.copy(speechResult = speechResult) }
                 }
             }
         }
@@ -127,7 +131,7 @@ internal class ChatViewModel @Inject constructor(
                         it.copy(
                             errorState = null,
                             isAiSpeaking = true,
-                            speechResult = null,
+                            speechResult = null
                         )
                     }
 
