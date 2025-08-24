@@ -23,10 +23,6 @@ A modern Android application that enables users to have natural voice conversati
 - **Voice Settings**: Choose between male/female voice options
 - **Session Management**: Continue or delete a selected conversation from your chat history
 
-## Demo Video
-
-*[Add your app screenshots here]*
-
 ## Architecture
 
 This project follows **Clean Architecture** principles with **MVI** pattern:
