@@ -30,7 +30,7 @@ import javax.inject.Inject
  */
 class GeminiInteractionStrategy @Inject constructor(
     @param:ApplicationContext
-    private val context: Context,
+    private val context: Context
 ) : GenerativeAiModelInteractionStrategy {
 
     /**
@@ -101,7 +101,7 @@ class GeminiInteractionStrategy @Inject constructor(
      */
     override suspend fun generateContentWithHistory(
         message: String,
-        chatHistory: List<ChatMessage>,
+        chatHistory: List<ChatMessage>
     ): String {
         val sortedChatHistory = chatHistory.sortedBy { it.timestamp }
         val mappedChatHistory = sortedChatHistory.map {

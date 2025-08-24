@@ -8,7 +8,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun ChatContainer(
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit,
+    navigateToHistory: () -> Unit
 ) {
     val viewModel: ChatViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

@@ -72,13 +72,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahmetsirim.common.utility.launchAppDetailsSettings
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.designsystem.component.InformationalDialog
 import com.ahmetsirim.designsystem.utility.ResponsivenessCheckerPreview
 import com.ahmetsirim.designsystem.utility.noRippleClickable
 import com.ahmetsirim.domain.model.ChatMessage
 import com.ahmetsirim.domain.model.SpeechResult
 import kotlinx.coroutines.launch
-import com.ahmetsirim.designsystem.R as coreR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +86,7 @@ internal fun ChatScreen(
     uiState: ChatContract.UiState,
     onEvent: (ChatContract.UiEvent) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToHistory: () -> Unit,
+    navigateToHistory: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -179,9 +179,9 @@ internal fun ChatScreen(
                 var lastClickTime by rememberSaveable { mutableLongStateOf(0L) }
                 val currentTime = System.currentTimeMillis()
 
-                val isMicrophoneReadyForListening = uiState.speechResult == null
-                        && currentTime - lastClickTime >= 500
-                        && uiState.messages.lastOrNull()?.isFromUser != true
+                val isMicrophoneReadyForListening = uiState.speechResult == null &&
+                    currentTime - lastClickTime >= 500 &&
+                    uiState.messages.lastOrNull()?.isFromUser != true
 
                 AnimatedMicrophoneButton(
                     context = context,
@@ -233,7 +233,7 @@ private fun AnimatedMicrophoneButton(
     speechResult: SpeechResult?,
     isAiTyping: Boolean,
     onEvent: (ChatContract.UiEvent) -> Unit,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     LaunchedEffect(speechResult) {
         if (speechResult is SpeechResult.Error) {
@@ -457,7 +457,7 @@ private fun ChatContent(
     modifier: Modifier = Modifier,
     messages: List<ChatMessage>,
     isAiTyping: Boolean,
-    listState: LazyListState,
+    listState: LazyListState
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),

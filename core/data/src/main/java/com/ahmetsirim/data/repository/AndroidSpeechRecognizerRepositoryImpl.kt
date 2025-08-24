@@ -8,21 +8,21 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import com.ahmetsirim.common.log.log
 import com.ahmetsirim.common.log.logError
+import com.ahmetsirim.designsystem.R as coreR
 import com.ahmetsirim.domain.model.SpeechResult
 import com.ahmetsirim.domain.repository.AndroidSpeechRecognizerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.sample
-import javax.inject.Inject
-import kotlin.math.abs
-import com.ahmetsirim.designsystem.R as coreR
 
 class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context
 ) : AndroidSpeechRecognizerRepository {
 
     private var speechRecognizer: SpeechRecognizer? = null
@@ -30,7 +30,7 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
 
     @OptIn(FlowPreview::class)
     override fun startListening(
-        languageCode: String,
+        languageCode: String
     ): Flow<SpeechResult> = callbackFlow {
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             log(message = "Speech recognition not available", tag = TAG)
@@ -70,19 +70,20 @@ class AndroidSpeechRecognizerRepositoryImpl @Inject constructor(
                         trySend(SpeechResult.Error(errorMessageResId = error))
                         log(
                             message = "Error occurred on listening: ${
-                                when (error) {
-                                    SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
-                                    SpeechRecognizer.ERROR_CLIENT -> "Client-side error"
-                                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Microphone permission required"
-                                    SpeechRecognizer.ERROR_NETWORK -> "Network connection error"
-                                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
-                                    SpeechRecognizer.ERROR_NO_MATCH -> "Speech not understood"
-                                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Speech recognizer is busy"
-                                    SpeechRecognizer.ERROR_SERVER -> "Server-side error"
-                                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
-                                    else -> "Unknown error: $error"
-                                }
-                            }", tag = TAG
+                            when (error) {
+                                SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
+                                SpeechRecognizer.ERROR_CLIENT -> "Client-side error"
+                                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Microphone permission required"
+                                SpeechRecognizer.ERROR_NETWORK -> "Network connection error"
+                                SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout"
+                                SpeechRecognizer.ERROR_NO_MATCH -> "Speech not understood"
+                                SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Speech recognizer is busy"
+                                SpeechRecognizer.ERROR_SERVER -> "Server-side error"
+                                SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
+                                else -> "Unknown error: $error"
+                            }
+                            }",
+                            tag = TAG
                         )
                         isListening = false
                     }

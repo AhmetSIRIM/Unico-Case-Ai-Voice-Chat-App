@@ -17,6 +17,7 @@ import com.ahmetsirim.domain.usecase.chat.SaveMessageUseCase
 import com.ahmetsirim.domain.usecase.chat.SpeakTextUseCase
 import com.ahmetsirim.domain.usecase.chat.StartListeningForSpeechUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 internal class ChatViewModel @Inject constructor(
@@ -36,7 +36,7 @@ internal class ChatViewModel @Inject constructor(
     private val speakTextUseCase: SpeakTextUseCase,
     private val cleanupResourcesUseCase: CleanupResourcesUseCase,
     private val networkMonitor: NetworkMonitor,
-    savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val sessionId = savedStateHandle.toRoute<ChatRoute>().sessionId
@@ -90,7 +90,6 @@ internal class ChatViewModel @Inject constructor(
 
     private fun startListeningForSpeech() {
         viewModelScope.launch {
-
             cleanupResourcesUseCase()
 
             startListeningForSpeechUseCase().collect { speechResult ->
