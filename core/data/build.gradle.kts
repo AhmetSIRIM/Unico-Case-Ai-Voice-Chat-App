@@ -18,32 +18,8 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
-            buildConfigField(
-                "String",
-                "GEMINI_GENERATIVE_AI_API_KEY",
-                "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: "debug_dummy_key"}\""
-            )
-            buildConfigField(
-                "String",
-                "GEMINI_GENERATIVE_AI_MODEL_NAME",
-                "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\""
-            )
-        }
-
         release {
             isMinifyEnabled = false
-
-            buildConfigField(
-                "String",
-                "GEMINI_GENERATIVE_AI_API_KEY",
-                "\"${project.findProperty("GEMINI_GENERATIVE_AI_API_KEY") ?: ""}\""
-            )
-            buildConfigField(
-                "String",
-                "GEMINI_GENERATIVE_AI_MODEL_NAME",
-                "\"${project.findProperty("GEMINI_GENERATIVE_AI_MODEL_NAME") ?: "gemini-pro"}\""
-            )
         }
     }
     compileOptions {

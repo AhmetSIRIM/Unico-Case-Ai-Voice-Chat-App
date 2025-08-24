@@ -73,7 +73,10 @@ This project follows **Clean Architecture** principles with **MVI** pattern:
    - Generate an API key
    - Add to `secrets.properties`: `GEMINI_GENERATIVE_AI_API_KEY=your_api_key`
 
-2. **Google Cloud Text-to-Speech API**:
+2. **Google Gemini AI Model Name**:
+   - Add to `secrets.properties`: `GEMINI_GENERATIVE_AI_MODEL_NAME=your_model_name`
+
+3. **Google Cloud Text-to-Speech API**:
    - Enable the API in [Google Cloud Console](https://console.cloud.google.com/)
    - Create credentials and get API key
    - Add to `secrets.properties`: `GOOGLE_CLOUD_TEXT_TO_SPEECH_API_KEY=your_api_key`
